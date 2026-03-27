@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Philmont 2025 — Itinerary 12-13</title>
+
+  <!-- Mapbox -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Loading screen -->
+  <div id="loading">
+    <h2>Philmont 2025</h2>
+    <p>Itinerary 12-13 · South Country</p>
+    <div class="loading-bar"></div>
+  </div>
+
+  <!-- Header -->
+  <div id="header">
+    <div id="header-title">
+      <span class="eyebrow">BSA Troop · Philmont Scout Ranch · Cimarron, NM</span>
+      <h1>Philmont 2025</h1>
+      <span class="sub">Itinerary 12-13 · South Country Rugged</span>
+    </div>
+    <div id="header-stats">
+      <div class="h-stat"><div class="val">59</div><div class="lbl">Miles</div></div>
+      <div class="h-stat"><div class="val">12</div><div class="lbl">Days</div></div>
+      <div class="h-stat"><div class="val">10,510'</div><div class="lbl">Max Elev</div></div>
+      <div class="h-stat"><div class="val">13</div><div class="lbl">Scouts</div></div>
+    </div>
+    <div id="header-controls">
+      <button class="ctrl-btn" id="btn-overview" onclick="flyToOverview()">Overview</button>
+      <button class="ctrl-btn active" id="btn-terrain" onclick="toggleTerrain()">3D Terrain</button>
+      <button class="ctrl-btn" id="btn-satellite" onclick="toggleSatellite()">Satellite</button>
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div id="main">
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div id="sidebar-top">
+        <div id="sidebar-label">Select a day to explore</div>
+      </div>
+      <div id="day-list"></div>
+      <div id="day-detail">
+        <div id="day-detail-placeholder">
+          <div class="placeholder-icon">🏔</div>
+          <div class="placeholder-title">South Country Rugged</div>
+          <div class="placeholder-body">Select a day from the list above to read the story of that leg of the trek, view photos, and replay the hike on the map.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map + Elevation -->
+    <div id="map-area">
+      <div id="map"></div>
+
+      <!-- Animation progress bar -->
+      <div id="anim-bar">
+        <span id="anim-label">Animating Day 1...</span>
+        <button id="anim-stop-btn" onclick="stopAnimation()">Stop</button>
+      </div>
+
+      <!-- Elevation strip -->
+      <div id="elevation-strip">
+        <div id="elev-label">Elevation Profile — Full Trek</div>
+        <canvas id="elev-chart"></canvas>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- Photo Modal -->
+  <div id="photo-modal">
+    <div id="photo-modal-inner">
+      <button id="modal-close" onclick="closeModal()">×</button>
+      <img id="modal-img" src="" alt="">
+      <div id="modal-info">
+        <div id="modal-title"></div>
+        <div id="modal-caption"></div>
+        <div id="modal-meta"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data (JS module avoids fetch/CORS issues when opening locally) -->
+  <script src="data.js"></script>
+
+  <!-- App logic -->
+  <script src="app.js"></script>
+
+</body>
+</html>
