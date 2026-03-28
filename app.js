@@ -20,10 +20,10 @@ function initMap() {
   map = new mapboxgl.Map({
     container: 'map',
     style:     'mapbox://styles/mapbox/outdoors-v12',
-    center:    MAP_CONFIG.center,
-    zoom:      MAP_CONFIG.zoom,
-    pitch:     MAP_CONFIG.pitch,
-    bearing:   MAP_CONFIG.bearing,
+    center:    TRIP.mapCenter,
+    zoom:      TRIP.mapZoom,
+    pitch:     TRIP.mapPitch,
+    bearing:   TRIP.mapBearing,
     antialias: true,
   });
 
@@ -40,7 +40,7 @@ function onMapLoad() {
     tileSize: 512,
     maxzoom:  14,
   });
-  map.setTerrain({ source: 'mapbox-dem', exaggeration: MAP_CONFIG.terrainExaggeration });
+  map.setTerrain({ source: 'mapbox-dem', exaggeration: TRIP.terrainExaggeration });
 
   // Atmosphere
   map.setFog({ range: [1, 12], color: '#e8e0d8', 'horizon-blend': 0.08 });
@@ -450,8 +450,8 @@ function computeBearing(from, to) {
 function flyToOverview() {
   stopAnimation();
   map.flyTo({
-    center:   MAP_CONFIG.center,
-    zoom:     MAP_CONFIG.zoom,
+    center:   TRIP.mapCenter,
+    zoom:     TRIP.mapZoom,
     pitch:    50,
     bearing:  -20,
     duration: 1800,
@@ -461,7 +461,7 @@ function flyToOverview() {
 
 function toggleTerrain() {
   terrainOn = !terrainOn;
-  map.setTerrain(terrainOn ? { source: 'mapbox-dem', exaggeration: MAP_CONFIG.terrainExaggeration } : null);
+  map.setTerrain(terrainOn ? { source: 'mapbox-dem', exaggeration: TRIP.terrainExaggeration } : null);
   document.getElementById('btn-terrain').classList.toggle('active', terrainOn);
 }
 

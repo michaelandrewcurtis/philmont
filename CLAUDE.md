@@ -51,8 +51,11 @@ Trip metadata object. Shape:
   dates:      String,    // human-readable date range
   totalMiles: Number,
   totalDays:  Number,
-  mapCenter:  [lng, lat],
-  mapZoom:    Number,
+  mapCenter:           [lng, lat],
+  mapZoom:             Number,
+  mapPitch:            Number,
+  mapBearing:          Number,
+  terrainExaggeration: Number,
 }
 ```
 

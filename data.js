@@ -16,6 +16,9 @@ const TRIP = {
   totalDays: 12,
   mapCenter: [-105.07, 36.44],
   mapZoom: 10.5,
+  mapPitch: 55,
+  mapBearing: -20,
+  terrainExaggeration: 1.6,
 };
 
 // ── Full decimated route (617 pts from 6,167 GPX points) ──
