@@ -1,337 +1,317 @@
-/* ═══════════════════════════════════════════════
-   PHILMONT 2025 — data.js
-   All trip data lives here. Edit this file to:
-     - Update camp narratives
-     - Add / remove photos
-     - Swap in real GPS route coordinates
-   ═══════════════════════════════════════════════
+// ============================================================
+// data.js — Philmont 2025 Trip Journal
+// Auto-generated from philmont-2025.gpx (617 points, step=10)
+// DO NOT hand-edit the FULL_ROUTE or ELEV_PROFILE arrays.
+// ============================================================
 
-   NOTE: This is a .js file rather than .json so it
-   can be loaded via <script src="data.js"> without
-   requiring a local web server. Pure JSON files
-   trigger CORS errors when opened as file:// URLs.
-*/
-
-// ── CONFIG ────────────────────────────────────────
 const MAPBOX_TOKEN = 'pk.eyJ1IjoibWljaGFlbGFuZGN1cnRpcyIsImEiOiItVTNSejNjIn0.3H1msxhcprTDvNrDpVRr-Q';
 
-const MAP_CONFIG = {
-  center:  [-104.9600, 36.5600],
-  zoom:    10.5,
-  pitch:   55,
-  bearing: -20,
-  terrainExaggeration: 1.6,
+// ── Trip overview ─────────────────────────────────────────
+const TRIP = {
+  title: "Philmont 2025",
+  subtitle: "Itinerary 12-13 · South Country Rugged · ~59 miles",
+  crew: "Crew 713",
+  dates: "June 22 – July 3, 2025",
+  totalMiles: 59,
+  totalDays: 12,
+  mapCenter: [-105.07, 36.44],
+  mapZoom: 10.5,
 };
 
-// ── ITINERARY ─────────────────────────────────────
-// Each entry is one day of the trek.
-// coords: [longitude, latitude] of the night's camp.
-// To swap in real GPS data, update FULL_ROUTE and
-// DAY_SEGMENTS below rather than these per-day coords.
+// ── Full decimated route (617 pts from 6,167 GPX points) ──
+const FULL_ROUTE = [
+  [-104.985933,36.380631],[-104.985751,36.381767],[-104.986252,36.382837],[-104.986931,36.385136],[-104.98586,36.387394],[-104.985169,36.388104],
+  [-104.985322,36.390201],[-104.985507,36.391614],[-104.986446,36.39231],[-104.986687,36.393034],[-104.987626,36.394153],[-104.987434,36.395081],
+  [-104.987283,36.396886],[-104.989025,36.398105],[-104.991135,36.399477],[-104.991983,36.400751],[-104.991409,36.401141],[-104.993078,36.401733],
+  [-104.993367,36.402291],[-104.992349,36.402832],[-104.991862,36.403821],[-104.992211,36.404573],[-104.992887,36.405435],[-104.993011,36.406178],
+  [-104.992895,36.406518],[-104.994286,36.408378],[-104.992987,36.407718],[-104.99298,36.408711],[-104.991765,36.407802],[-104.991569,36.408186],
+  [-104.992036,36.409756],[-104.991246,36.409836],[-104.990852,36.409351],[-104.99029,36.410085],[-104.9907,36.411387],[-104.991038,36.412878],
+  [-104.990633,36.413293],[-104.990173,36.414152],[-104.989234,36.413761],[-104.988956,36.41444],[-104.988299,36.414949],[-104.987524,36.415282],
+  [-104.987574,36.416776],[-104.989084,36.418404],[-104.990242,36.418507],[-104.990343,36.419705],[-104.990288,36.420803],[-104.990373,36.422237],
+  [-104.989018,36.423471],[-104.988016,36.425603],[-104.987112,36.426676],[-104.987826,36.427891],[-104.988554,36.428848],[-104.988914,36.430011],
+  [-104.989622,36.430363],[-104.990906,36.429768],[-104.991471,36.430099],[-104.991031,36.431488],[-104.992086,36.431647],[-104.993556,36.431846],
+  [-104.993812,36.432747],[-104.991704,36.434858],[-104.991918,36.434133],[-104.993801,36.434013],[-104.993981,36.432066],[-104.992113,36.43019],
+  [-104.991833,36.429056],[-104.99224,36.428363],[-104.991961,36.427444],[-104.992776,36.426755],[-104.993565,36.426222],[-104.99549,36.426115],
+  [-104.996767,36.425322],[-104.997432,36.426064],[-104.999249,36.425067],[-105.000351,36.424091],[-105.001631,36.423721],[-105.002728,36.423813],
+  [-105.00267,36.423703],[-105.003585,36.422839],[-105.00486,36.422681],[-105.005356,36.422311],[-105.006629,36.422067],[-105.006981,36.421852],
+  [-105.008793,36.421376],[-105.009822,36.420707],[-105.011327,36.420942],[-105.013305,36.420791],[-105.01466,36.420985],[-105.017027,36.421183],
+  [-105.017486,36.42079],[-105.018089,36.420571],[-105.019306,36.420314],[-105.021311,36.420238],[-105.023613,36.420134],[-105.025703,36.419774],
+  [-105.027385,36.419759],[-105.027871,36.420363],[-105.029752,36.420828],[-105.033521,36.421792],[-105.035242,36.420612],[-105.038364,36.419788],
+  [-105.042072,36.419332],[-105.043412,36.419683],[-105.042995,36.420917],[-105.042186,36.422127],[-105.042018,36.423673],[-105.04148,36.425433],
+  [-105.041679,36.427522],[-105.04231,36.428376],[-105.042705,36.429147],[-105.042244,36.429723],[-105.041981,36.431096],[-105.041415,36.433116],
+  [-105.039577,36.43163],[-105.037396,36.430824],[-105.035523,36.429938],[-105.035521,36.430198],[-105.034864,36.429811],[-105.03679,36.430615],
+  [-105.039006,36.431401],[-105.040774,36.432638],[-105.041512,36.434028],[-105.041244,36.435535],[-105.038894,36.436413],[-105.040294,36.436452],
+  [-105.042883,36.436085],[-105.043475,36.43626],[-105.044711,36.436164],[-105.045636,36.435895],[-105.046625,36.436408],[-105.048007,36.436112],
+  [-105.049277,36.435766],[-105.050886,36.435293],[-105.051931,36.435069],[-105.05294,36.434916],[-105.053988,36.434843],[-105.055105,36.434537],
+  [-105.056338,36.434574],[-105.057183,36.433901],[-105.058375,36.433461],[-105.059327,36.433139],[-105.060661,36.433078],[-105.062459,36.431991],
+  [-105.063784,36.431501],[-105.065118,36.431094],[-105.0665,36.430687],[-105.067953,36.430488],[-105.069369,36.430287],[-105.070296,36.430166],
+  [-105.071762,36.429645],[-105.073899,36.429557],[-105.075436,36.42953],[-105.077078,36.430503],[-105.078459,36.430905],[-105.079932,36.431164],
+  [-105.08147,36.431438],[-105.082608,36.431909],[-105.08405,36.432289],[-105.085458,36.432768],[-105.086102,36.43281],[-105.086421,36.433379],
+  [-105.086875,36.434046],[-105.087123,36.435045],[-105.087415,36.436305],[-105.088119,36.437752],[-105.089237,36.439039],[-105.089825,36.439803],
+  [-105.090955,36.44066],[-105.091754,36.440834],[-105.092254,36.44167],[-105.093227,36.442392],[-105.093728,36.4429],[-105.094526,36.442846],
+  [-105.095156,36.443918],[-105.095409,36.442972],[-105.095608,36.441596],[-105.097809,36.441089],[-105.099019,36.440898],[-105.099995,36.440531],
+  [-105.098853,36.441446],[-105.097833,36.441934],[-105.0994,36.441627],[-105.100866,36.441349],[-105.101869,36.441371],[-105.103332,36.43988],
+  [-105.103531,36.438918],[-105.102808,36.438199],[-105.100428,36.438357],[-105.100228,36.437435],[-105.102132,36.436519],[-105.103969,36.437105],
+  [-105.106152,36.437271],[-105.106426,36.437495],[-105.106448,36.438694],[-105.106639,36.439531],[-105.108035,36.438927],[-105.107196,36.440036],
+  [-105.106485,36.441867],[-105.106611,36.443203],[-105.106043,36.444701],[-105.107477,36.445473],[-105.107216,36.444264],[-105.10881,36.442606],
+  [-105.110453,36.445546],[-105.112586,36.445311],[-105.114925,36.444751],[-105.116982,36.444229],[-105.118633,36.445708],[-105.12017,36.447652],
+  [-105.123155,36.448464],[-105.125154,36.449989],[-105.127051,36.4518],[-105.129786,36.452755],[-105.131434,36.454835],[-105.131567,36.457065],
+  [-105.131764,36.458501],[-105.132526,36.460297],[-105.13302,36.461367],[-105.131897,36.463156],[-105.130937,36.46486],[-105.130887,36.466984],
+  [-105.131079,36.468284],[-105.131091,36.47005],[-105.131778,36.470975],[-105.131519,36.471811],[-105.133321,36.472225],[-105.132841,36.473222],
+  [-105.132911,36.474957],[-105.133555,36.476611],[-105.13487,36.477014],[-105.136289,36.477402],[-105.137303,36.478453],[-105.138058,36.479904],
+  [-105.139817,36.480453],[-105.141719,36.480861],[-105.142824,36.480023],[-105.144931,36.479523],[-105.146787,36.478922],[-105.147928,36.477838],
+  [-105.148696,36.477166],[-105.149354,36.47681],[-105.148961,36.475722],[-105.150515,36.473813],[-105.151026,36.474881],[-105.152591,36.476001],
+  [-105.15531,36.476451],[-105.158004,36.477212],[-105.159709,36.476757],[-105.158181,36.477235],[-105.155661,36.47653],[-105.152908,36.476011],
+  [-105.151101,36.475037],[-105.1507,36.47376],[-105.14903,36.475674],[-105.149444,36.476829],[-105.148659,36.477087],[-105.14808,36.477765],
+  [-105.146899,36.478832],[-105.145066,36.479476],[-105.14251,36.480165],[-105.141486,36.48082],[-105.139647,36.4805],[-105.13813,36.481813],
+  [-105.136065,36.479691],[-105.136006,36.480591],[-105.136301,36.483729],[-105.134966,36.484291],[-105.133827,36.483715],[-105.132584,36.484173],
+  [-105.131737,36.483982],[-105.131411,36.483595],[-105.132367,36.486559],[-105.131868,36.486798],[-105.130093,36.484394],[-105.129376,36.483034],
+  [-105.128681,36.485382],[-105.128317,36.486139],[-105.12556,36.486042],[-105.124781,36.485805],[-105.125869,36.485106],[-105.124147,36.485467],
+  [-105.122107,36.485533],[-105.119935,36.484331],[-105.118698,36.484276],[-105.117108,36.484086],[-105.116032,36.484412],[-105.114684,36.4848],
+  [-105.112456,36.485289],[-105.110293,36.485875],[-105.107552,36.486605],[-105.104811,36.486775],[-105.103927,36.485644],[-105.104678,36.483966],
+  [-105.104332,36.482245],[-105.106149,36.480136],[-105.104118,36.481394],[-105.100733,36.483502],[-105.100179,36.483671],[-105.103859,36.481614],
+  [-105.10638,36.47989],[-105.109993,36.477177],[-105.106473,36.479845],[-105.104118,36.481394],[-105.100733,36.483502],[-105.096275,36.484611],
+  [-105.093723,36.484415],[-105.09207,36.483315],[-105.089396,36.483212],[-105.087363,36.483085],[-105.085327,36.482864],[-105.083713,36.483319],
+  [-105.08234,36.483923],[-105.080747,36.484446],[-105.079431,36.484682],[-105.077707,36.485171],[-105.075781,36.485194],[-105.075316,36.485885],
+  [-105.074077,36.486306],[-105.073091,36.486092],[-105.071257,36.485937],[-105.069589,36.485908],[-105.068199,36.485638],[-105.066274,36.485502],
+  [-105.064749,36.485887],[-105.063704,36.485579],[-105.063337,36.486068],[-105.063081,36.486556],[-105.062473,36.486659],[-105.063085,36.487561],
+  [-105.063686,36.488719],[-105.062538,36.488125],[-105.062704,36.489166],[-105.063472,36.490277],[-105.063563,36.491886],[-105.063753,36.493393],
+  [-105.063966,36.4948],[-105.064729,36.496329],[-105.064206,36.495942],[-105.064426,36.497373],[-105.064904,36.498802],[-105.06547,36.499259],
+  [-105.064917,36.503088],[-105.065022,36.504762],[-105.066499,36.504406],[-105.06659,36.504919],[-105.064819,36.504624],[-105.065465,36.501749],
+  [-105.065328,36.498898],[-105.064909,36.499276],[-105.064683,36.499522],[-105.063678,36.498622],[-105.062858,36.497865],[-105.063043,36.498082],
+  [-105.063855,36.498707],[-105.065004,36.499791],[-105.064374,36.501119],[-105.063351,36.502791],[-105.063,36.503226],[-105.061953,36.502306],
+  [-105.061774,36.502647],[-105.061431,36.502963],[-105.061123,36.503921],[-105.059148,36.503867],[-105.058265,36.503899],[-105.057312,36.504288],
+  [-105.057291,36.505528],[-105.056971,36.505007],[-105.056613,36.503621],[-105.056236,36.504262],[-105.056845,36.506294],[-105.057634,36.507531],
+  [-105.057236,36.508595],[-105.057829,36.510494],[-105.058619,36.512108],[-105.05937,36.513269],[-105.059539,36.514733],[-105.059575,36.516529],
+  [-105.059421,36.514968],[-105.059635,36.513511],[-105.058809,36.512463],[-105.057947,36.510999],[-105.05751,36.509543],[-105.057251,36.507716],
+  [-105.056988,36.506913],[-105.056542,36.505198],[-105.056421,36.503802],[-105.056573,36.504182],[-105.057204,36.505589],[-105.057373,36.504615],
+  [-105.057817,36.503828],[-105.058742,36.503799],[-105.060591,36.5041],[-105.06143,36.503181],[-105.061825,36.502925],[-105.061802,36.502156],
+  [-105.062835,36.503282],[-105.063771,36.502562],[-105.064256,36.501394],[-105.064938,36.499896],[-105.064923,36.499249],[-105.065413,36.49895],
+  [-105.064807,36.498615],[-105.064464,36.496973],[-105.064356,36.496021],[-105.064266,36.495423],[-105.063833,36.494035],[-105.063619,36.492668],
+  [-105.063523,36.491466],[-105.063271,36.48988],[-105.062691,36.488866],[-105.06299,36.488301],[-105.06352,36.488319],[-105.062904,36.487283],
+  [-105.062517,36.486601],[-105.061591,36.485777],[-105.060709,36.485287],[-105.060223,36.484888],[-105.059593,36.484526],[-105.059667,36.483647],
+  [-105.059263,36.4825],[-105.057834,36.48128],[-105.058708,36.481057],[-105.059292,36.480559],[-105.059418,36.480155],[-105.059071,36.479451],
+  [-105.058724,36.478137],[-105.058494,36.477642],[-105.057929,36.47633],[-105.057463,36.475118],[-105.056316,36.4743],[-105.054852,36.4743],
+  [-105.05346,36.474529],[-105.054585,36.473755],[-105.053762,36.473287],[-105.052245,36.472737],[-105.051651,36.472527],[-105.050631,36.471418],
+  [-105.049494,36.470593],[-105.048427,36.469189],[-105.048381,36.469516],[-105.048427,36.470538],[-105.048244,36.469163],[-105.048427,36.469189],
+  [-105.048259,36.467325],[-105.04649,36.466988],[-105.047664,36.464942],[-105.047744,36.46389],[-105.048574,36.462896],[-105.049173,36.461383],
+  [-105.049713,36.459715],[-105.049131,36.458719],[-105.048476,36.458046],[-105.047824,36.458113],[-105.047709,36.45891],[-105.046696,36.459194],
+  [-105.046314,36.458857],[-105.046041,36.457426],[-105.046052,36.456502],[-105.046003,36.455646],[-105.046216,36.454845],[-105.046977,36.453872],
+  [-105.047084,36.452843],[-105.046515,36.451644],[-105.045937,36.450373],[-105.044835,36.449314],[-105.045881,36.447646],[-105.046918,36.447371],
+  [-105.045827,36.447838],[-105.044773,36.449523],[-105.045495,36.450859],[-105.044963,36.452557],[-105.044567,36.45133],[-105.042523,36.45049],
+  [-105.041333,36.448704],[-105.038962,36.446979],[-105.037637,36.447222],[-105.036731,36.448757],[-105.036308,36.449678],[-105.03719,36.450361],
+  [-105.036065,36.449633],[-105.034625,36.450067],[-105.033096,36.45039],[-105.031758,36.450446],[-105.030721,36.450595],[-105.029709,36.450627],
+  [-105.028938,36.450329],[-105.028208,36.450116],[-105.027637,36.450166],[-105.026568,36.449632],[-105.026088,36.449251],[-105.025628,36.44901],
+  [-105.025123,36.448798],[-105.024073,36.448801],[-105.023561,36.448766],[-105.023224,36.448412],[-105.022492,36.448919],[-105.021591,36.449212],
+  [-105.020685,36.44919],[-105.020053,36.449048],[-105.019369,36.448979],[-105.018716,36.448727],[-105.017582,36.448785],[-105.01712,36.449263],
+  [-105.016393,36.44919],[-105.015508,36.449276],[-105.014186,36.449749],[-105.012672,36.449319],[-105.01226,36.449279],[-105.011137,36.449528],
+  [-105.010163,36.44982],[-105.009368,36.449944],[-105.009217,36.450072],[-105.007263,36.450081],[-105.006214,36.450459],[-105.006058,36.449187],
+  [-105.006953,36.449206],[-105.007798,36.448238],[-105.007642,36.448568],[-105.006711,36.44931],[-105.005785,36.449901],[-105.003701,36.450472],
+  [-105.002259,36.449953],[-105.000545,36.449633],[-104.998895,36.449537],[-104.998039,36.449431],[-104.999484,36.449681],[-105.001237,36.449587],
+  [-105.002874,36.449912],[-105.004495,36.450833],[-105.006246,36.449307],[-105.007083,36.4491],[-105.007816,36.448225],[-105.006969,36.449111],
+  [-105.006131,36.449207],[-105.004414,36.450862],[-105.002781,36.449931],[-105.001087,36.449581],[-104.999406,36.449745],[-104.998453,36.450892],
+  [-104.996599,36.451435],[-104.994395,36.452465],[-104.99352,36.453425],[-104.992512,36.453562],[-104.990513,36.45383],[-104.989401,36.453127],
+  [-104.98816,36.453514],[-104.988556,36.454547],[-104.989362,36.455363],[-104.989595,36.455668],[-104.987202,36.455436],[-104.986372,36.455228],
+  [-104.985213,36.455042],[-104.985257,36.454127],[-104.984786,36.453766],[-104.983847,36.454049],[-104.983711,36.453648],[-104.983858,36.452685],
+  [-104.983922,36.451914],[-104.98303,36.452577],[-104.982515,36.453391],[-104.982042,36.453748],[-104.981709,36.453887],[-104.981577,36.454639],
+  [-104.981559,36.454992],[-104.98102,36.455179],[-104.980447,36.454537],[-104.979181,36.455468],[-104.979075,36.455915],[-104.979113,36.454374],
+  [-104.979198,36.45368],[-104.978599,36.454359],[-104.977889,36.455016],[-104.977166,36.455573],[-104.97726,36.456187],[-104.976898,36.45686],
+  [-104.977723,36.457344],[-104.978161,36.458128],[-104.978884,36.458608],[-104.977868,36.458672],[-104.977019,36.458327],[-104.977022,36.457933],
+  [-104.976834,36.457653],[-104.975704,36.457415],[-104.975116,36.45716],[-104.974951,36.45628],[-104.974973,36.455328],[-104.97449,36.456141],
+  [-104.974279,36.456961],[-104.973424,36.45738],[-104.972967,36.45799],[-104.972748,36.457106],[-104.972253,36.457378],[-104.971739,36.457724],
+  [-104.971267,36.458318],[-104.970944,36.458692],[-104.970973,36.459342],[-104.971423,36.460079],[-104.971153,36.460328],[-104.970174,36.460283],
+  [-104.96879,36.460348],[-104.969931,36.460825],[-104.969268,36.460859],[-104.968354,36.460925],[-104.967647,36.460879],[-104.966456,36.461009],
+  [-104.965191,36.460879],[-104.964375,36.460865],[-104.963543,36.460766],[-104.963714,36.459726],[-104.963838,36.458498],[-104.963992,36.457248],
+  [-104.963421,36.456522],[-104.963333,36.45521],[-104.962243,36.453411],[-104.961565,36.453454],[-104.959471,36.454216]
+];
+
+// ── Day segment indices into FULL_ROUTE ───────────────────
+const DAY_SEGMENTS = [
+  { start: 0,   end: 0   },  // Day 1:  Camping HQ (no hike)
+  { start: 0,   end: 31  },  // Day 2:  Zastrow TH → Toothache Springs
+  { start: 31,  end: 61  },  // Day 3:  Toothache Springs → Magpie
+  { start: 61,  end: 92  },  // Day 4:  Magpie → Miners Park
+  { start: 92,  end: 123 },  // Day 5:  Miners Park → Black Mountain
+  { start: 123, end: 166 },  // Day 6:  Black Mountain → Divide
+  { start: 166, end: 246 },  // Day 7:  Divide → Lamberts Mine
+  { start: 246, end: 277 },  // Day 8:  Lamberts Mine → Cimarroncito
+  { start: 277, end: 338 },  // Day 9:  Cimarroncito (layover loop)
+  { start: 338, end: 369 },  // Day 10: Cimarroncito → Clarks Fork
+  { start: 369, end: 554 },  // Day 11: Clarks Fork → Tooth Ridge
+  { start: 554, end: 616 },  // Day 12: Tooth Ridge → Camping HQ
+];
+
+// ── Elevation profile (ft) matching FULL_ROUTE ────────────
+const ELEV_PROFILE = [
+  6919.6,6922.6,6941.3,7014.8,7118.1,7158.1,7296.9,7393.7,7467.8,7543.3,7605.0,7688.0,
+  7753.9,7819.5,7861.9,7949.1,8016.1,8089.6,8171.9,8306.1,8324.8,8329.7,8345.8,8326.1,
+  8244.4,8202.4,8171.3,8122.7,8109.9,8072.8,8022.3,7982.0,7972.4,7945.5,7950.8,7930.1,
+  7883.5,7807.4,7762.5,7715.9,7655.2,7612.9,7528.2,7534.8,7493.8,7534.8,7578.4,7640.7,
+  7678.8,7586.0,7537.7,7501.0,7442.3,7363.5,7285.4,7216.5,7180.4,7084.0,7076.1,7102.4,
+  7112.2,7085.3,7085.3,7112.9,7110.2,7141.1,7174.5,7192.9,7220.5,7240.2,7283.5,7341.2,
+  7366.1,7381.9,7421.3,7448.2,7437.7,7425.2,7437.7,7445.5,7422.6,7419.9,7404.9,7393.0,
+  7375.3,7365.5,7331.4,7368.1,7366.1,7425.2,7468.5,7502.6,7572.8,7622.7,7630.6,7599.7,
+  7588.6,7545.3,7549.9,7612.9,7690.9,7790.7,7916.0,7955.7,7958.7,7966.9,7979.7,7975.7,
+  8013.8,8040.0,8089.2,8103.7,8151.6,8206.0,8255.2,8323.5,8364.2,8437.7,8392.4,8330.1,
+  8280.8,8227.7,8196.2,8129.9,8093.2,8023.6,7974.4,7976.0,7991.1,8020.3,8029.5,8052.5,
+  8071.2,8099.7,8111.5,8124.0,8139.8,8159.8,8172.6,8196.8,8219.5,8232.9,8253.9,8292.3,
+  8304.8,8333.7,8360.6,8398.6,8425.2,8440.0,8478.0,8530.2,8555.4,8593.2,8620.7,8639.1,
+  8667.3,8695.5,8705.4,8744.1,8741.8,8750.0,8768.0,8794.9,8823.8,8856.9,8885.8,8902.9,
+  8923.9,8942.2,8956.7,8980.3,9009.8,9089.2,9116.8,9183.7,9206.7,9288.1,9326.4,9365.8,
+  9404.5,9423.2,9478.0,9535.8,9598.1,9623.4,9632.2,9652.9,9707.3,9744.4,9818.2,9819.6,
+  9885.5,9921.9,9974.7,10030.5,10071.2,10127.0,10186.7,10226.4,10271.6,10353.0,10379.9,10469.2,
+  10561.3,10526.9,10481.6,10593.5,10542.0,10642.7,10677.2,10803.1,10857.3,10856.3,10730.0,10695.5,
+  10749.7,10788.4,10785.8,10955.0,10984.3,10831.0,10716.9,10579.1,10624.7,10684.1,10775.9,10858.3,
+  10952.8,11011.8,11020.0,11100.1,11082.0,11066.9,11094.2,11167.6,11272.6,11258.5,11214.6,11176.5,
+  11235.6,11299.9,11351.4,11498.7,11574.5,11587.3,11611.9,11666.3,11732.9,11670.6,11619.1,11594.5,
+  11571.2,11502.0,11363.8,11303.1,11238.8,11186.7,11215.6,11251.6,11257.9,11160.1,11089.2,11083.7,
+  10970.1,10900.6,10839.2,10752.0,10662.4,10574.5,10469.8,10414.0,10364.2,10301.8,10181.4,10088.6,
+  9992.5,9972.8,9862.9,9777.9,9711.0,9667.6,9581.0,9453.4,9395.3,9327.7,9289.7,9249.3,
+  9195.5,9130.2,9065.6,9008.2,8995.4,8961.6,8909.1,8859.6,8762.1,8666.0,8660.4,8753.3,
+  8863.5,9025.9,8868.1,8762.1,8666.0,8568.2,8511.2,8462.6,8391.1,8362.5,8285.4,8237.9,
+  8189.6,8154.5,8121.4,8084.0,8023.6,8013.5,7976.4,7952.4,7912.1,7892.7,7861.9,7831.4,
+  7819.5,7777.6,7784.8,7782.8,7807.7,7830.7,7837.3,7893.0,7914.0,7935.0,7963.9,7987.5,
+  8024.3,8057.7,8076.1,8116.8,8141.7,8141.1,8097.1,8110.2,8150.3,8145.0,8103.0,8123.4,
+  8139.8,8152.2,8164.7,8244.8,8335.3,8311.7,8223.8,8149.0,8155.5,8122.7,8078.7,8055.1,
+  7997.4,7956.7,7932.4,7912.7,7905.5,7899.6,7897.0,7861.5,7834.6,7783.5,7727.7,7761.2,
+  7796.6,7832.0,7780.2,7820.2,7797.9,7871.4,7811.0,7824.8,7785.4,7820.2,7818.9,7774.3,
+  7742.8,7769.7,7824.8,7832.7,7879.9,7902.2,7903.5,7906.8,7915.4,7952.1,7986.9,8041.3,
+  8080.7,8109.6,8149.6,8153.5,8150.9,8139.1,8140.4,8102.4,8058.4,8034.1,8003.9,7982.3,
+  7961.3,7926.5,7904.2,7868.8,7836.0,7824.1,7803.8,7780.8,7762.5,7752.6,7744.8,7702.1,
+  7696.2,7675.2,7693.6,7717.8,7727.7,7740.8,7747.4,7753.3,7790.0,7786.7,7755.9,7725.7,
+  7680.4,7649.0,7641.1,7620.7,7607.6,7593.2,7572.8,7519.7,7517.1,7503.9,7517.1,7519.7,
+  7560.4,7647.0,7707.3,7718.5,7836.6,7888.5,7937.0,7972.4,7937.7,7950.1,7981.0,8045.9,
+  8066.3,8161.4,8215.9,8284.1,8349.7,8444.2,8550.5,8685.7,8786.7,8750.0,8726.4,8792.0,
+  8727.7,8762.5,8810.4,8847.8,8933.7,8967.8,9030.2,9134.5,9183.7,9259.8,9318.9,9404.9,
+  9285.4,9207.3,9168.6,9142.4,9166.7,9198.8,9204.7,9178.5,9183.7,9173.2,9144.4,9125.3,
+  9084.0,9074.1,9058.4,9034.8,9061.0,9037.4,9005.9,8980.3,8968.5,8985.6,9003.3,8958.7,
+  8946.9,8912.7,8853.7,8818.9,8805.8,8764.4,8748.7,8697.5,8677.2,8624.0,8558.4,8607.0,
+  8732.3,8919.3,8864.2,8703.4,8561.7,8421.9,8397.0,8341.2,8297.2,8278.2,8300.5,8381.9,
+  8437.0,8492.1,8631.2,8753.9,8919.3,8737.5,8619.4,8485.6,8426.5,8371.4,8298.6,8318.9,
+  8261.8,8217.8,8284.8,8250.0,8193.6,8164.0,8128.6,8099.1,8072.2,8038.1,7995.4,7975.1,
+  7954.7,7939.0,7899.0,7888.5,7855.6,7832.0,7792.7,7771.7,7740.2,7732.3,7725.1,7714.6,
+  7721.1,7698.2,7671.9,7648.3,7622.7,7606.3,7578.1,7562.3,7544.0,7514.4,7509.2,7500.0,
+  7502.6,7496.1,7463.9,7454.7,7446.2,7435.0,7428.5,7431.8,7406.2,7407.5,7386.5,7362.9,
+  7356.3,7338.6,7303.1,7286.7,7253.3,7227.7,7198.2,7185.7,7154.2,7125.3,7096.5,7083.3,
+  7032.8,6988.2,6958.0,6935.7,6937.7,6905.5,6879.9,6865.5,6832.7,6796.6,6769.7,6756.6,
+  6728.3,6714.6,6712.6,6722.4,6709.3
+];
+
+// ── Camp markers (coords from GPX) ───────────────────────
 const DAYS = [
   {
-    day: 1,
-    camp: "Camping HQ",
-    shortCamp: "Base Camp",
-    from: null,
-    to: "Camping HQ",
-    miles: 0,
-    gain: 0,
-    loss: 0,
-    elevation: 6630,
-    coords: [-104.8989, 36.4635],
-    features: ["Opening Campfire", "Gear Check", "Crew Orientation"],
-    campType: "staffed",
-    narrative: "Arrival day at Philmont's historic base camp, nestled at 6,630 feet in the foothills east of Cimarrón. The afternoon is a blur of gear sorting, bear bag practice, and the nervous anticipation that comes with standing at the trailhead of something you've been training for all year. The Opening Campfire brings the crew together under a canopy of stars unlike anything back home — a reminder of why you came. Tomorrow, the mountains begin."
+    day: 1, name: "Camping HQ", subtitle: "Arrival Day",
+    miles: 0, gain: 0, loss: 0, elevation: 6920,
+    coords: { lat: 36.38063, lng: -104.98593 },
+    type: "staffed",
+    features: ["Opening Campfire", "Ranger Check-in", "Kit Inspection"],
+    narrative: "The crew arrives at Philmont Scout Ranch and settles into base camp. Tonight's Opening Campfire kicks off twelve days of high-country adventure. Gear sorted, rangers met — tomorrow the backcountry begins.",
+    photos: [],
   },
   {
-    day: 2,
-    camp: "Toothache Springs",
-    shortCamp: "Toothache Spgs",
-    from: "Camping HQ (Zastrow TH)",
-    to: "Toothache Springs",
-    miles: 4.7,
-    gain: 958,
-    loss: 22,
-    elevation: 7960,
-    coords: [-104.9280, 36.5060],
-    features: ["Ranger Training", "Fire Recovery Zone", "Trail Camp"],
-    campType: "trail",
-    narrative: "The real trek begins with a shuttle to Zastrow Trailhead before the first footstep on trail. Your Ranger joins the crew here — part guide, part wilderness instructor, entirely essential. The climb north through the Fire Recovery Zone is a living classroom: scorched snags stand alongside explosive regrowth, a testament to the forest's resilience. Nearly a thousand feet of gain brings you to Toothache Springs as afternoon clouds build over the ridges above. First night under the pines."
+    day: 2, name: "Toothache Springs", subtitle: "Day 2 · Ranger Training",
+    miles: 4.7, gain: 958, loss: 0, elevation: 7969,
+    coords: { lat: 36.40915, lng: -104.99061 },
+    type: "trail",
+    features: ["Ranger Training", "Fire Recovery Zone", "Zastrow Trailhead"],
+    narrative: "Shouldering full packs for the first time, the crew departs Zastrow Trailhead and climbs through the Fire Recovery Zone. The ranger joins for the day's first miles, teaching Leave No Trace and bear bag protocol. Camp at Toothache Springs — the backcountry officially starts.",
+    photos: [],
   },
   {
-    day: 3,
-    camp: "Magpie",
-    shortCamp: "Magpie",
-    from: "Toothache Springs",
-    to: "Magpie",
-    miles: 3.9,
-    gain: 744,
-    loss: 1129,
-    elevation: 7570,
-    coords: [-104.9520, 36.5340],
-    features: ["Low COPE @ Urraca", "Dry Camp", "Water @ North Fork Urraca Creek"],
-    campType: "dry",
-    narrative: "A shorter day by the numbers, but the Low COPE program at Urraca demands something harder than mileage: teamwork. The crew works through challenge initiatives that expose every communication fault and interpersonal friction the backcountry hasn't ironed out yet. By the time you reach Magpie — a dry camp requiring water carries from North Fork Urraca Creek — there's a different quality to how the scouts talk to each other. The mountains are doing their work."
+    day: 3, name: "Magpie", subtitle: "Day 3 · Dry Camp",
+    miles: 3.9, gain: 744, loss: 1129, elevation: 7082,
+    coords: { lat: 36.43366, lng: -104.99153 },
+    type: "dry",
+    features: ["Low COPE @ Urraca", "Dry Camp", "Ridge Walking"],
+    narrative: "Rolling terrain through ponderosa pine and mixed conifer. The crew stops at Urraca for Low COPE — trust falls, log rolls, and initiative games that test communication more than muscles. Magpie is a dry camp: water carried from Toothache, every drop counted.",
+    photos: [],
   },
   {
-    day: 4,
-    camp: "Miners Park",
-    shortCamp: "Miners Park",
-    from: "Magpie",
-    to: "Miners Park",
-    miles: 5.0,
-    gain: 1480,
-    loss: 945,
-    elevation: 8800,
-    coords: [-104.9780, 36.5580],
-    features: ["High COPE Program", "Lovers Leap Overlook", "Climbing & Rappelling"],
-    campType: "staffed",
-    narrative: "The High COPE course at Miners Park is a ropes course suspended in the trees — a vertical laboratory for trust and courage. The Lovers Leap Overlook offers the first commanding views south toward the plains, a vista that reminds everyone how far the world extends beyond a screen. By afternoon, climbing and rappelling at the natural rock faces introduces scouts to the vertical element that will recur throughout the south country. Miners Park earns its staffed camp status."
+    day: 4, name: "Miners Park", subtitle: "Day 4 · High COPE & Climbing",
+    miles: 5.0, gain: 1480, loss: 0, elevation: 7608,
+    coords: { lat: 36.42050, lng: -105.02032 },
+    type: "staffed",
+    features: ["High COPE", "Lovers Leap", "Rock Climbing"],
+    narrative: "The big day for vertical challenge. High COPE pushes the crew on rope bridges and climbing walls before the afternoon opens up technical rock at Lovers Leap. Views from the top stretch east toward the Cimarron Range. Miners Park has a staffed welcome with cold lemonade.",
+    photos: [],
   },
   {
-    day: 5,
-    camp: "Black Mountain",
-    shortCamp: "Black Mtn",
-    from: "Miners Park",
-    to: "Black Mountain",
-    miles: 5.1,
-    gain: 1475,
-    loss: 431,
-    elevation: 9634,
-    coords: [-104.9960, 36.5850],
-    features: ["Trail Building Project", "North Fork Urraca", "Black Mountain Encampment"],
-    campType: "trail",
-    narrative: "The conservation ethic is alive at Black Mountain. The Trail Building Project puts scouts to work with pulaskis and mcLeods, shaping the very trail that future crews will walk. It's hard, gratifying labor — the kind that leaves a mark on the land and on you. The Black Mountain Encampment sits high in the timber, and on clear evenings the summit ridge catches the last golden light. At 9,634 feet, the air has a different character. The crew has found its stride."
+    day: 5, name: "Black Mountain", subtitle: "Day 5 · Trail Building",
+    miles: 5.1, gain: 1475, loss: 0, elevation: 8136,
+    coords: { lat: 36.43583, lng: -105.04069 },
+    type: "trail",
+    features: ["Trail Building", "Black Mountain Encampment", "Conservation Work"],
+    narrative: "Swinging Pulaskis and moving rock in service of Philmont's trail crew. The crew earns conservation hours on a sustained switchback section — hard work that makes the evening campfire feel earned. Black Mountain Encampment sits just below treeline with long views into the South Country.",
+    photos: [],
   },
   {
-    day: 6,
-    camp: "Divide",
-    shortCamp: "Divide",
-    from: "Black Mountain",
-    to: "Divide",
-    miles: 4.2,
-    gain: 2492,
-    loss: 932,
-    elevation: 11150,
-    coords: [-104.9700, 36.6140],
-    features: ["Bonito Peak", "Big Red", "Dry Camp", "Water @ Red Hills"],
-    campType: "dry",
-    narrative: "This is the day the trek earns its 'rugged' classification. Nearly 2,500 feet of gain over 4.2 miles, threading past Bonito Peak and the iconic formation called Big Red. The climb is relentless, but the reward is proportional: Divide Camp sits near timberline, where the world falls away in every direction and the wind has an opinion about everything. Another dry camp — water carries are planned and executed with the efficiency of a crew that's learned from the miles behind them."
+    day: 6, name: "Divide", subtitle: "Day 6 · Bonito Peak · Dry Camp",
+    miles: 4.2, gain: 2492, loss: 0, elevation: 8889,
+    coords: { lat: 36.43910, lng: -105.08929 },
+    type: "dry",
+    features: ["Bonito Peak", "Big Red fire lookout", "Dry Camp", "Continental Divide views"],
+    narrative: "The biggest elevation day. The crew grinds up to Bonito Peak and swings past Big Red, Philmont's iconic fire lookout tower with a 360° panorama. Camp at Divide is the highest yet — wind, stars, and the quiet that only comes above 8,500 feet.",
+    photos: [],
   },
   {
-    day: 7,
-    camp: "Lamberts Mine",
-    shortCamp: "Lamberts Mine",
-    from: "Divide",
-    to: "Lamberts Mine",
-    miles: 10.1,
-    gain: 1738,
-    loss: 3321,
-    elevation: 8140,
-    coords: [-105.0230, 36.6400],
-    features: ["Mt. Phillips (optional)", "Comanche Peak", "Cyphers Mine", "Mining History"],
-    campType: "staffed",
-    narrative: "The big day. Ten miles, the option to summit Mount Phillips, and a descent of more than 3,300 feet that tests every knee the crew has brought into the backcountry. Those who make the push to Mount Phillips — at nearly 11,700 feet, the high point of Philmont — earn a view that stretches into Colorado. Cyphers Mine delivers living history: costumed interpreters bring the 1880s gold rush to life in the tunnels. The long descent into Lamberts Mine ends with sore legs and stories that will outlast the blisters."
+    day: 7, name: "Lamberts Mine", subtitle: "Day 7 · Mt. Phillips Option · Longest Day",
+    miles: 10.1, gain: 1738, loss: 3321, elevation: 11637,
+    coords: { lat: 36.47675, lng: -105.15639 },
+    type: "staffed",
+    features: ["Mt. Phillips Summit (11,742ft)", "Cyphers Mine", "Longest Day", "Western horizon views"],
+    narrative: "The big one. An optional pre-dawn push bags Mt. Phillips before the crew drops thousands of feet through aspen groves to Cyphers Mine for a living-history program. Lamberts Mine sits at the western edge of the permit area. Ten miles on tired legs, but the summit makes every step worth it.",
+    photos: [],
   },
   {
-    day: 8,
-    camp: "Cimarroncito",
-    shortCamp: "Cimarroncito",
-    from: "Lamberts Mine",
-    to: "Cimarroncito",
-    miles: 4.1,
-    gain: 424,
-    loss: 1272,
-    elevation: 7300,
-    coords: [-105.0100, 36.5980],
-    features: ["Window Rock (optional)", "Climbing & Rappelling"],
-    campType: "staffed",
-    narrative: "A recovery day by distance, but the climbing program at Cimarroncito asks tired arms to find reserves they weren't sure existed. Window Rock — a natural arch framing a rectangle of sky — rewards those who make the side trip. Cimarroncito's staffed camp comes with warm interactions and a sense that the trek's midpoint is behind you. The crew begins calculating what's left, what's been done, and how they've changed in the doing of it."
+    day: 8, name: "Cimarroncito", subtitle: "Day 8 · Rock Climbing",
+    miles: 4.1, gain: 424, loss: 0, elevation: 9945,
+    coords: { lat: 36.48607, lng: -105.12772 },
+    type: "staffed",
+    features: ["Window Rock Climbing", "Rock Program", "Staffed Camp"],
+    narrative: "A shorter day by design — legs are happy for it. The route arrives at Cimarroncito in time for an afternoon on the rock. Window Rock's routes draw beginners and experienced climbers alike. Cimarroncito's staff program runs into the evening.",
+    photos: [],
   },
   {
-    day: 9,
-    camp: "Cimarroncito",
-    shortCamp: "Cimarroncito II",
-    from: "Cimarroncito",
-    to: "Cimarroncito (layover)",
-    miles: 4.9,
-    gain: 650,
-    loss: 655,
-    elevation: 7300,
-    coords: [-105.0100, 36.5980],
-    features: ["Climbing & Rappelling (continued)", "Layover Day"],
-    campType: "layover",
-    narrative: "A second day at Cimarroncito deepens the climbing program — lead climbing, multi-pitch anchors, rappelling variations that build on what was introduced yesterday. The layover rhythm settles into the crew: a slower morning, skills work through midday, the freedom of the afternoon. Camp becomes a place rather than just a waypoint. Scouts who were tentative on the rock yesterday move with new confidence today. The mountains have a way of accelerating certain kinds of growth."
+    day: 9, name: "Cimarroncito", subtitle: "Day 9 · Layover Day",
+    miles: 4.9, gain: 0, loss: 0, elevation: 8102,
+    coords: { lat: 36.49697, lng: -105.06446 },
+    type: "layover",
+    features: ["Climbing Continued", "Rest Day", "Optional Day Hike"],
+    narrative: "A true layover — packs stay in camp, boots optional. The climbers go back to the wall; the hikers wander the ridgeline. A rare gift of unstructured time in the backcountry. Gear patched, journals caught up, card games in the shade.",
+    photos: [],
   },
   {
-    day: 10,
-    camp: "Clarks Fork",
-    shortCamp: "Clarks Fork",
-    from: "Cimarroncito",
-    to: "Clarks Fork",
-    miles: 5.2,
-    gain: 169,
-    loss: 800,
-    elevation: 6670,
-    coords: [-104.9620, 36.5420],
-    features: ["Demonstration Forest", "Horse Ride", "Western Lore Program", "Chuckwagon Dinner"],
-    campType: "staffed",
-    narrative: "The western lore program at Clarks Fork is pure Philmont mythology made real: horses, chuckwagons, and an evening under the stars with the Ranch's living history program. The horse ride through ponderosa pine and meadow feels like stepping into a century-old photograph. The Chuckwagon Dinner and Campfire Show is the social peak of the trek — a chance to laugh, eat well, and feel the bonds that twelve days in the backcountry have forged between the members of this crew."
+    day: 10, name: "Clarks Fork", subtitle: "Day 10 · Horse Ride & Chuckwagon",
+    miles: 5.2, gain: 169, loss: 0, elevation: 7734,
+    coords: { lat: 36.50548, lng: -105.05658 },
+    type: "staffed",
+    features: ["Horse Ride", "Chuckwagon Dinner", "Western Program"],
+    narrative: "The crew trades boots for stirrups as Clarks Fork's wranglers lead a trail ride through meadow and ponderosa. The evening chuckwagon dinner — Dutch oven cobbler and all — closes with campfire stories that feel like the Old West.",
+    photos: [],
   },
   {
-    day: 11,
-    camp: "Tooth Ridge",
-    shortCamp: "Tooth Ridge",
-    from: "Clarks Fork",
-    to: "Tooth Ridge",
-    miles: 5.9,
-    gain: 2248,
-    loss: 1470,
-    elevation: 7440,
-    coords: [-104.9300, 36.4990],
-    features: ["Shaefers Peak", "Tooth of Time", "Dry Camp", "Water @ Clarks Fork"],
-    campType: "dry",
-    narrative: "The Tooth of Time dominates the Philmont skyline — a volcanic plug visible from the highway forty miles away, the symbol that tells every scout they're home. Reaching its summit on Day 11 is the emotional apex of the journey, a viewshed that encompasses the entire route traveled: Black Mountain to the north, Divide in the distance, Cimarroncito below. Shaefers Peak offers its own rewards. Tooth Ridge dry camp sits beneath the stars with the plains glowing amber to the east. One day left."
+    day: 11, name: "Tooth Ridge", subtitle: "Day 11 · Shaefers Peak · Tooth of Time · Dry Camp",
+    miles: 5.9, gain: 2248, loss: 0, elevation: 7883,
+    coords: { lat: 36.45350, lng: -104.98437 },
+    type: "dry",
+    features: ["Shaefers Peak", "Tooth of Time Ridge", "Dry Camp", "Base camp views"],
+    narrative: "The penultimate day, and Philmont saves its most iconic vista for last. The Tooth of Time has guided scouts home since 1938. The crew scrambles the rocky summit and looks down on base camp far below. Last night under the stars.",
+    photos: [],
   },
   {
-    day: 12,
-    camp: "Camping HQ",
-    shortCamp: "Base Camp (Return)",
-    from: "Tooth Ridge",
-    to: "Camping HQ",
-    miles: 5.8,
-    gain: 858,
-    loss: 2461,
-    elevation: 6630,
-    coords: [-104.8989, 36.4635],
-    features: ["Hike Into Base", "Closing Campfire", "Arrowhead Award"],
-    campType: "staffed",
-    narrative: "The final descent back to Camping HQ is bittersweet in the way that all meaningful endings are. The crew that hiked out twelve days ago and the crew hiking in now are the same people carrying different weight — not in their packs, which are considerably lighter, but in their bearing. The Closing Campfire acknowledges what was done. The Arrowhead Award marks those who completed the trek. But the real award is harder to hang on a wall: the knowledge that when the trail asked something of you, you had it to give."
-  }
+    day: 12, name: "Camping HQ", subtitle: "Day 12 · Closing Campfire · Arrowhead Award",
+    miles: 5.8, gain: 0, loss: 0, elevation: 6708,
+    coords: { lat: 36.45427, lng: -104.95923 },
+    type: "staffed",
+    features: ["Closing Campfire", "Arrowhead Award", "Trek Complete"],
+    narrative: "The final descent off Tooth Ridge into base camp. Hot showers, all-you-can-eat dining, and the weight of an empty pack. The Closing Campfire awards Arrowheads to all who completed the full trek. Twelve days, fifty-nine miles, one crew.",
+    photos: [],
+  },
 ];
 
-// ── PHOTOS ────────────────────────────────────────
-// Add your real photos here.
-// url:   direct link to the full-size image
-// thumb: link to a smaller thumbnail (can be same as url)
-// coords: [longitude, latitude] where the photo was taken
+// ── Photo markers ─────────────────────────────────────────
+// Add entries after uploading photos to WordPress or hosting provider.
+// Format: { lat, lng, url, caption, day }
 const PHOTOS = [
-  {
-    day: 2,
-    coords: [-104.9150, 36.4920],
-    title: "Zastrow Trailhead",
-    caption: "Day 2 departure — the trail begins here.",
-    url: "",
-    thumb: ""
-  },
-  {
-    day: 4,
-    coords: [-104.9780, 36.5510],
-    title: "Lovers Leap Overlook",
-    caption: "First big views south toward the plains.",
-    url: "",
-    thumb: ""
-  },
-  {
-    day: 5,
-    coords: [-104.9960, 36.5820],
-    title: "Trail Work",
-    caption: "Conservation project on the Black Mountain trail.",
-    url: "",
-    thumb: ""
-  },
-  {
-    day: 6,
-    coords: [-104.9700, 36.6100],
-    title: "Big Red",
-    caption: "The iconic red rock formation near Divide Camp.",
-    url: "",
-    thumb: ""
-  },
-  {
-    day: 7,
-    coords: [-104.9920, 36.6280],
-    title: "Mount Phillips Summit",
-    caption: "Nearly 11,700 feet — the high point of the trek.",
-    url: "",
-    thumb: ""
-  },
-  {
-    day: 11,
-    coords: [-104.9330, 36.4990],
-    title: "Tooth of Time Summit",
-    caption: "The Tooth — visible from 40 miles away.",
-    url: "",
-    thumb: ""
-  }
-];
-
-// ── ROUTE COORDINATES ─────────────────────────────
-// Approximated from known Philmont geography.
-// Replace with coordinates exported from your GPX file
-// for a precise trail line. Each entry: [lng, lat].
-const FULL_ROUTE = [
-  [-104.8989, 36.4635],
-  [-104.9010, 36.4680], [-104.9050, 36.4740], [-104.9100, 36.4830],
-  [-104.9150, 36.4900], [-104.9180, 36.4960], [-104.9220, 36.5010],
-  [-104.9260, 36.5040], [-104.9280, 36.5060],
-  [-104.9300, 36.5100], [-104.9340, 36.5160], [-104.9380, 36.5220],
-  [-104.9420, 36.5280], [-104.9470, 36.5310], [-104.9520, 36.5340],
-  [-104.9560, 36.5370], [-104.9600, 36.5410], [-104.9640, 36.5450],
-  [-104.9680, 36.5490], [-104.9720, 36.5530], [-104.9780, 36.5580],
-  [-104.9820, 36.5620], [-104.9860, 36.5680], [-104.9890, 36.5730],
-  [-104.9920, 36.5780], [-104.9950, 36.5820], [-104.9960, 36.5850],
-  [-104.9930, 36.5900], [-104.9880, 36.5960], [-104.9830, 36.6020],
-  [-104.9780, 36.6070], [-104.9740, 36.6110], [-104.9700, 36.6140],
-  [-104.9750, 36.6200], [-104.9820, 36.6270], [-104.9900, 36.6330],
-  [-104.9980, 36.6380], [-105.0060, 36.6400], [-105.0160, 36.6410],
-  [-105.0230, 36.6400],
-  [-105.0200, 36.6340], [-105.0170, 36.6270], [-105.0140, 36.6200],
-  [-105.0120, 36.6120], [-105.0110, 36.6050], [-105.0100, 36.5980],
-  [-105.0080, 36.5950], [-105.0060, 36.5920], [-105.0080, 36.5950],
-  [-105.0100, 36.5980],
-  [-105.0070, 36.5900], [-104.9990, 36.5800], [-104.9900, 36.5700],
-  [-104.9800, 36.5600], [-104.9720, 36.5520], [-104.9640, 36.5460],
-  [-104.9620, 36.5420],
-  [-104.9580, 36.5360], [-104.9530, 36.5290], [-104.9480, 36.5220],
-  [-104.9420, 36.5160], [-104.9360, 36.5090], [-104.9310, 36.5030],
-  [-104.9300, 36.4990],
-  [-104.9270, 36.4940], [-104.9220, 36.4880], [-104.9160, 36.4820],
-  [-104.9100, 36.4770], [-104.9040, 36.4710], [-104.8989, 36.4635],
-];
-
-// Maps each day to its slice of FULL_ROUTE (start/end index).
-// Update these if you add more GPS points to FULL_ROUTE.
-const DAY_SEGMENTS = [
-  { start: 0,  end: 0  }, // Day 1  — base camp, no hike
-  { start: 0,  end: 8  }, // Day 2  — Zastrow TH → Toothache Springs
-  { start: 8,  end: 14 }, // Day 3  — Toothache Springs → Magpie
-  { start: 14, end: 20 }, // Day 4  — Magpie → Miners Park
-  { start: 20, end: 26 }, // Day 5  — Miners Park → Black Mountain
-  { start: 26, end: 32 }, // Day 6  — Black Mountain → Divide
-  { start: 32, end: 39 }, // Day 7  — Divide → Lamberts Mine
-  { start: 39, end: 45 }, // Day 8  — Lamberts Mine → Cimarroncito
-  { start: 45, end: 49 }, // Day 9  — Cimarroncito layover loop
-  { start: 49, end: 55 }, // Day 10 — Cimarroncito → Clarks Fork
-  { start: 55, end: 62 }, // Day 11 — Clarks Fork → Tooth Ridge
-  { start: 62, end: 68 }, // Day 12 — Tooth Ridge → Base Camp
-];
-
-// ── ELEVATION PROFILE ─────────────────────────────
-// Approximate elevations (feet) matching FULL_ROUTE points.
-// Replace with elevation data extracted from your GPX file.
-const ELEV_PROFILE = [
-  6630, 6700, 6900, 7100, 7400, 7600, 7800, 7900, 7960,
-  7900, 7750, 7600, 7500, 7470, 7570,
-  7600, 7700, 7900, 8200, 8500, 8700, 8800,
-  8900, 9100, 9300, 9500, 9580, 9634,
-  9600, 9500, 9800, 10200, 10700, 11000, 11150,
-  11100, 11200, 11400, 11500, 11600, 11650, 11700, 11000,
-  10200, 9400, 8600, 8200, 7900, 7550,
-  7500, 7450, 7400, 7350, 7310, 7280, 7300,
-  7280, 7260, 7300, 7280,
-  7250, 7100, 6950, 6800, 6730, 6690, 6680, 6670,
-  6750, 6900, 7100, 7300, 7350, 7400, 7440,
-  7500, 7400, 7200, 7000, 6850, 6700, 6630,
+  // { lat: 36.4768, lng: -105.1564, url: "https://yoursite.com/.../mt-phillips.jpg", caption: "Summit of Mt. Phillips, 11,742ft", day: 7 },
 ];
