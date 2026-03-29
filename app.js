@@ -125,7 +125,7 @@ function restoreRouteLayers() {
       maxzoom:  14,
     });
   }
-  if (terrainOn) map.setTerrain({ source: 'mapbox-dem', exaggeration: MAP_CONFIG.terrainExaggeration });
+  if (terrainOn) map.setTerrain({ source: 'mapbox-dem', exaggeration: TRIP.terrainExaggeration });
 
   if (!map.getSource('full-route')) {
     map.addSource('full-route', { type: 'geojson', data: { type: 'Feature', geometry: { type: 'LineString', coordinates: FULL_ROUTE } } });
