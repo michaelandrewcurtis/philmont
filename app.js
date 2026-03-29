@@ -386,17 +386,43 @@ function playDay(dayNum) {
   });
 
   const totalPoints  = segCoords.length;
-  const DURATION_MS  = totalPoints * 80; // ~80ms per point — adjust to taste
+  const DURATION_MS  = totalPoints * 150; // ~150ms per point — adjust to taste
+  const segElev      = ELEV_PROFILE.slice(seg.start, seg.end + 1);
   let startTime      = null;
+
+  // ── Pitch tuning ──────────────────────────────────────────
+  // PITCH_CLIMB: camera angle when ascending (high = tight on the slope ahead)
+  // PITCH_DESCENT: camera angle when descending (low = pulls back to reveal the drop)
+  // ELEV_LOOKAHEAD: how many points ahead to sample for gradient detection
+  // PITCH_SMOOTH: lerp factor per frame (lower = slower transition, higher = snappier)
+  const PITCH_CLIMB    = 72;   // degrees — steep, close to the terrain
+  const PITCH_DESCENT  = 32;   // degrees — wide, reveals what's ahead
+  const ELEV_LOOKAHEAD = 20;   // points ahead to compare elevation
+  const PITCH_SMOOTH   = 0.04; // 0–1: how fast pitch transitions between values
+  // ──────────────────────────────────────────────────────────
+
+  let currentPitch = 65;
 
   function lerp(a, b, t) {
     return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
   }
 
+  function lerpNum(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function targetPitch(i) {
+    const ahead = Math.min(i + ELEV_LOOKAHEAD, totalPoints - 1);
+    const elevDiff = segElev[ahead] - segElev[i];
+    // Blend smoothly: flat ground sits midway between the two extremes
+    const climbT = Math.max(0, Math.min(1, (elevDiff + 30) / 60)); // +30ft = flat, +60ft = full climb
+    return lerpNum(PITCH_DESCENT, PITCH_CLIMB, climbT);
+  }
+
   map.flyTo({
     center:   segCoords[0],
     zoom:     14.5,
-    pitch:    65,
+    pitch:    PITCH_CLIMB,
     bearing:  computeBearing(segCoords[0], segCoords[Math.min(3, totalPoints - 1)]),
     duration: 1200,
     essential: true,
@@ -421,10 +447,11 @@ function playDay(dayNum) {
     });
 
     if (i < totalPoints - 1) {
+      currentPitch = lerpNum(currentPitch, targetPitch(i), PITCH_SMOOTH);
       map.easeTo({
         center:   currentPos,
-        bearing:  computeBearing(currentPos, segCoords[Math.min(i + 4, totalPoints - 1)]),
-        pitch:    62,
+        bearing:  computeBearing(currentPos, segCoords[Math.min(i + 8, totalPoints - 1)]),
+        pitch:    currentPitch,
         zoom:     14.5,
         duration: 100,
         essential: true,
