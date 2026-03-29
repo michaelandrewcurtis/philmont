@@ -10,7 +10,7 @@ let activeDay  = null;
 let animating  = false;
 let animFrame  = null;
 let terrainOn  = true;
-let satelliteOn = false;
+let satelliteOn = true;
 let elevChart  = null;
 
 // ── INIT ──────────────────────────────────────────
@@ -19,7 +19,7 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 function initMap() {
   map = new mapboxgl.Map({
     container: 'map',
-    style:     'mapbox://styles/mapbox/outdoors-v12',
+    style:     'mapbox://styles/mapbox/satellite-streets-v12',
     center:    TRIP.mapCenter,
     zoom:      TRIP.mapZoom,
     pitch:     TRIP.mapPitch,
@@ -151,6 +151,10 @@ function restoreRouteLayers() {
   }
 
   if (activeDay) selectDay(activeDay);
+
+  // Sync button states with initial defaults
+  document.getElementById('btn-satellite').classList.toggle('active', satelliteOn);
+  document.getElementById('btn-terrain').classList.toggle('active', terrainOn);
 }
 
 // ── CAMP MARKERS ──────────────────────────────────
