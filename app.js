@@ -399,23 +399,27 @@ function playDay(dayNum) {
   // PITCH_DESCENT: camera angle when descending (low = pulls back to reveal the drop)
   // ELEV_LOOKAHEAD: how many points ahead to sample for gradient detection
   // PITCH_SMOOTH: lerp factor per frame (lower = slower transition, higher = snappier)
-  const PITCH_CLIMB    = 60;   // degrees — steep, close to the terrain
+  const PITCH_CLIMB    = 65;   // degrees — steep, close to the terrain
   const PITCH_DESCENT  = 20;   // degrees — wide, reveals what's ahead
   const ELEV_LOOKAHEAD = 20;   // points ahead to compare elevation
   const PITCH_SMOOTH   = 0.04; // 0–1: how fast pitch transitions between values
   // ──────────────────────────────────────────────────────────
 
-  let currentPitch   = 60;
+  let currentPitch   = 65;
 
   // ── Bearing tuning ────────────────────────────────────────
   // BEARING_LOOKAHEAD: points ahead used to compute target heading
   //   (higher = smoother direction, less responsive to tight turns)
   // BEARING_SMOOTH: lerp factor per frame (lower = slower/floatier rotation)
-  const BEARING_LOOKAHEAD = 20;  // points ahead — raise to reduce jitter
-  const BEARING_SMOOTH    = 0.06; // 0–1: rotation speed per frame
+  const BEARING_LOOKAHEAD = 70;  // points ahead — raise to reduce jitter
+  const BEARING_SMOOTH    = 0.001; // 0–1: rotation speed per frame
   // ──────────────────────────────────────────────────────────
 
-  let currentBearing = computeBearing(segCoords[0], segCoords[Math.min(3, totalPoints - 1)]);
+  // Use per-day startBearing from data.js if set, otherwise compute from trail direction
+  const initialBearing = DAYS[dayNum - 1].startBearing !== null
+    ? DAYS[dayNum - 1].startBearing
+    : computeBearing(segCoords[0], segCoords[Math.min(3, totalPoints - 1)]);
+  let currentBearing = initialBearing;
 
   function lerp(a, b, t) {
     return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
@@ -437,7 +441,7 @@ function playDay(dayNum) {
     center:   segCoords[0],
     zoom:     14.5,
     pitch:    PITCH_CLIMB,
-    bearing:  computeBearing(segCoords[0], segCoords[Math.min(3, totalPoints - 1)]),
+    bearing:  initialBearing,
     duration: 1200,
     essential: true,
   });

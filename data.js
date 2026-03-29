@@ -1056,9 +1056,9 @@ const FULL_ROUTE = [
 // ── Day segment indices into FULL_ROUTE ───────────────────
 const DAY_SEGMENTS = [
   { start: 0,    end: 0    },  // Day 1:  Camping HQ (no hike)
-  { start: 0,    end: 317   },  // Day 2:  Zastrow TH → Toothache Springs
-  { start: 317,   end: 616   },  // Day 3:  Toothache Springs → Magpie
-  { start: 616,   end: 924   },  // Day 4:  Magpie → Miners Park
+  { start: 0,    end: 137   },  // Day 2:  Zastrow TH → Toothache Springs
+  { start: 137,   end: 520   },  // Day 3:  Toothache Springs → Magpie
+  { start: 520,   end: 924   },  // Day 4:  Magpie → Miners Park
   { start: 924,   end: 1232   },  // Day 5:  Miners Park → Black Mountain
   { start: 1232,   end: 1661   },  // Day 6:  Black Mountain → Divide
   { start: 1661,   end: 2464   },  // Day 7:  Divide → Lamberts Mine
@@ -1591,6 +1591,7 @@ const ELEV_PROFILE = [
 const DAYS = [
   {
     day: 1, name: "Camping HQ", subtitle: "Arrival Day",
+    startBearing: null,  // degrees 0–360, or null to auto-compute from trail direction
     miles: 0, gain: 0, loss: 0, elevation: 6920,
     coords: { lat: 36.38063, lng: -104.98593 },
     type: "staffed",
@@ -1600,6 +1601,7 @@ const DAYS = [
   },
   {
     day: 2, name: "Toothache Springs", subtitle: "Day 2 · Ranger Training",
+    startBearing: null,
     miles: 4.7, gain: 958, loss: 0, elevation: 7969,
     coords: { lat: 36.40915, lng: -104.99061 },
     type: "trail",
@@ -1609,6 +1611,7 @@ const DAYS = [
   },
   {
     day: 3, name: "Magpie", subtitle: "Day 3 · Dry Camp",
+    startBearing: null,
     miles: 3.9, gain: 744, loss: 1129, elevation: 7082,
     coords: { lat: 36.43366, lng: -104.99153 },
     type: "dry",
@@ -1618,6 +1621,7 @@ const DAYS = [
   },
   {
     day: 4, name: "Miners Park", subtitle: "Day 4 · High COPE & Climbing",
+    startBearing: null,
     miles: 5.0, gain: 1480, loss: 0, elevation: 7608,
     coords: { lat: 36.42050, lng: -105.02032 },
     type: "staffed",
@@ -1627,6 +1631,7 @@ const DAYS = [
   },
   {
     day: 5, name: "Black Mountain", subtitle: "Day 5 · Trail Building",
+    startBearing: null,
     miles: 5.1, gain: 1475, loss: 0, elevation: 8136,
     coords: { lat: 36.43583, lng: -105.04069 },
     type: "trail",
@@ -1636,6 +1641,7 @@ const DAYS = [
   },
   {
     day: 6, name: "Divide", subtitle: "Day 6 · Bonito Peak · Dry Camp",
+    startBearing: null,
     miles: 4.2, gain: 2492, loss: 0, elevation: 8889,
     coords: { lat: 36.43910, lng: -105.08929 },
     type: "dry",
@@ -1645,6 +1651,7 @@ const DAYS = [
   },
   {
     day: 7, name: "Lamberts Mine", subtitle: "Day 7 · Mt. Phillips Option · Longest Day",
+    startBearing: null,
     miles: 10.1, gain: 1738, loss: 3321, elevation: 11637,
     coords: { lat: 36.47675, lng: -105.15639 },
     type: "staffed",
@@ -1654,6 +1661,7 @@ const DAYS = [
   },
   {
     day: 8, name: "Cimarroncito", subtitle: "Day 8 · Rock Climbing",
+    startBearing: null,
     miles: 4.1, gain: 424, loss: 0, elevation: 9945,
     coords: { lat: 36.48607, lng: -105.12772 },
     type: "staffed",
@@ -1663,6 +1671,7 @@ const DAYS = [
   },
   {
     day: 9, name: "Cimarroncito", subtitle: "Day 9 · Layover Day",
+    startBearing: null,
     miles: 4.9, gain: 0, loss: 0, elevation: 8102,
     coords: { lat: 36.49697, lng: -105.06446 },
     type: "layover",
@@ -1672,6 +1681,7 @@ const DAYS = [
   },
   {
     day: 10, name: "Clarks Fork", subtitle: "Day 10 · Horse Ride & Chuckwagon",
+    startBearing: null,
     miles: 5.2, gain: 169, loss: 0, elevation: 7734,
     coords: { lat: 36.50548, lng: -105.05658 },
     type: "staffed",
@@ -1681,6 +1691,7 @@ const DAYS = [
   },
   {
     day: 11, name: "Tooth Ridge", subtitle: "Day 11 · Shaefers Peak · Tooth of Time · Dry Camp",
+    startBearing: null,
     miles: 5.9, gain: 2248, loss: 0, elevation: 7883,
     coords: { lat: 36.45350, lng: -104.98437 },
     type: "dry",
@@ -1690,6 +1701,7 @@ const DAYS = [
   },
   {
     day: 12, name: "Camping HQ", subtitle: "Day 12 · Closing Campfire · Arrowhead Award",
+    startBearing: null,
     miles: 5.8, gain: 0, loss: 0, elevation: 6708,
     coords: { lat: 36.45427, lng: -104.95923 },
     type: "staffed",

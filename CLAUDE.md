@@ -63,9 +63,10 @@ Trip metadata object. Shape:
 Array of 12 objects, one per day. Shape:
 ```js
 {
-  day:       Number,             // 1–12
-  name:      String,             // full camp name
-  subtitle:  String,             // "Day N · short description"
+  day:          Number,          // 1–12
+  name:         String,          // full camp name
+  subtitle:     String,          // "Day N · short description"
+  startBearing: Number | null,   // initial camera bearing for animation (0–360°), null = auto-computed
   miles:     Number,             // 0 for Day 1
   gain:      Number,             // elevation gain in feet
   loss:      Number,             // elevation loss in feet
