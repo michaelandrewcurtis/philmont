@@ -285,18 +285,16 @@ function updateActiveSegment(dayNum) {
 }
 
 function flyToSegment(dayNum) {
-  const d        = DAYS[dayNum - 1];
-  const seg      = DAY_SEGMENTS[dayNum - 1];
+  const d         = DAYS[dayNum - 1];
+  const seg       = DAY_SEGMENTS[dayNum - 1];
   const segCoords = FULL_ROUTE.slice(seg.start, seg.end + 1);
 
-  if (segCoords.length > 1) {
-    const bounds = segCoords.reduce(
-      (b, c) => b.extend(c),
-      new mapboxgl.LngLatBounds(segCoords[0], segCoords[0])
-    );
-    map.fitBounds(bounds, { padding: 80, pitch: 55, bearing: -20, duration: 1200 });
+  if (dayNum === 1) {
+    // Day 1 has no route — fly to base camp
+    map.flyTo({ center: [d.coords.lng, d.coords.lat], zoom: 13, pitch: 50, bearing: -15, duration: 1200 });
   } else {
-    map.flyTo({ center: d.coords, zoom: 12, pitch: 50, bearing: -15, duration: 1200 });
+    // All other days: fly to the segment start point
+    map.flyTo({ center: segCoords[0], zoom: 13, pitch: 50, bearing: -15, duration: 1200 });
   }
 }
 
