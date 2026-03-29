@@ -153,7 +153,7 @@ function addCampMarkers() {
       width:        '10px',
       height:       '10px',
       borderRadius: '50%',
-      background:   colorMap[d.campType] || '#7a7065',
+      background:   colorMap[d.nameType] || '#7a7065',
       border:       '2px solid #f5f0e8',
       cursor:       'pointer',
       transition:   'transform 0.2s',
@@ -166,7 +166,7 @@ function addCampMarkers() {
     const popup = new mapboxgl.Popup({ className: 'camp-popup', offset: 12, closeButton: false })
       .setHTML(`
         <div class="popup-day">Day ${d.day}</div>
-        <div class="popup-name">${d.camp}</div>
+        <div class="popup-name">${d.name}</div>
         ${d.miles ? `<div class="popup-miles">${d.miles} mi · +${d.gain.toLocaleString()}'</div>` : ''}
       `);
 
@@ -291,7 +291,7 @@ function renderDayDetail(d) {
   const panel = document.getElementById('day-detail');
 
   const campBadgeMap = { staffed: '★ Staffed', trail: '◆ Trail', dry: '○ Dry Camp', layover: '⟳ Layover' };
-  const campBadge    = campBadgeMap[d.campType] || '';
+  const campBadge    = campBadgeMap[d.nameType] || '';
 
   const featureTags = d.features
     .map(f => `<span class="feature-tag">${f}</span>`)
@@ -314,7 +314,7 @@ function renderDayDetail(d) {
 
   panel.innerHTML = `
     <div id="detail-day-label">Day ${d.day} of 12 · ${campBadge}</div>
-    <div id="detail-camp-name">${d.camp}</div>
+    <div id="detail-camp-name">${d.name}</div>
     <div id="detail-route">${d.from ? d.from + ' → ' + d.to : 'Trek begins here'}</div>
 
     <div class="detail-stats-row">
