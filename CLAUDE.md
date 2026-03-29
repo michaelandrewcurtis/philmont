@@ -93,7 +93,7 @@ Array of photo objects. Shape:
 **To add a photo:** append an entry to `PHOTOS[]`. The sidebar photo grid and map marker are both generated automatically. No changes needed in `app.js`.
 
 ### `FULL_ROUTE`
-Array of `[lng, lat]` pairs forming the complete 12-day trail as a single LineString. Decimated from real GPX data (2056 pts from 6,167 GPX points — step=3).
+Array of `[lng, lat]` pairs forming the complete 12-day trail as a single LineString. All GPX points included (6,167 pts, step=1). `DAY_SEGMENTS` indices are direct GPX point indices and can be adjusted manually to fine-tune where each day's segment starts/ends on the trail.
 
 ### `DAY_SEGMENTS[]`
 Maps each day (index 0–11) to a `{ start, end }` slice of `FULL_ROUTE`. Derived from the same GPX export as `FULL_ROUTE`.
