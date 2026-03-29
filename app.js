@@ -153,7 +153,7 @@ function addCampMarkers() {
       width:        '10px',
       height:       '10px',
       borderRadius: '50%',
-      background:   colorMap[d.nameType] || '#7a7065',
+      background:   colorMap[d.type] || '#7a7065',
       border:       '2px solid #f5f0e8',
       cursor:       'pointer',
       transition:   'transform 0.2s',
@@ -228,7 +228,7 @@ function buildSidebar() {
     item.innerHTML = `
       <div class="day-num">${d.day}</div>
       <div class="day-info">
-        <div class="day-camp">${d.shortCamp}</div>
+        <div class="day-camp">${d.name}</div>
         <div class="day-meta">${d.miles ? d.miles + ' mi · +' + d.gain.toLocaleString() + '\'' : 'Base Camp'}</div>
       </div>
     `;
@@ -291,7 +291,7 @@ function renderDayDetail(d) {
   const panel = document.getElementById('day-detail');
 
   const campBadgeMap = { staffed: '★ Staffed', trail: '◆ Trail', dry: '○ Dry Camp', layover: '⟳ Layover' };
-  const campBadge    = campBadgeMap[d.nameType] || '';
+  const campBadge    = campBadgeMap[d.type] || '';
 
   const featureTags = d.features
     .map(f => `<span class="feature-tag">${f}</span>`)
@@ -364,7 +364,7 @@ function playDay(dayNum) {
 
   animating = true;
   document.getElementById('anim-bar').classList.add('visible');
-  document.getElementById('anim-label').textContent = `Day ${dayNum}: ${DAYS[dayNum - 1].camp}`;
+  document.getElementById('anim-label').textContent = `Day ${dayNum}: ${DAYS[dayNum - 1].name}`;
 
   document.querySelectorAll('.day-play-btn').forEach(b => b.classList.remove('playing'));
   const pb = document.getElementById(`play-btn-${dayNum}`);
@@ -552,7 +552,7 @@ function openModal(photo) {
   document.getElementById('modal-img').src      = photo.url || PLACEHOLDER;
   document.getElementById('modal-title').textContent   = photo.title;
   document.getElementById('modal-caption').textContent = photo.caption || '';
-  document.getElementById('modal-meta').textContent    = `Day ${photo.day} · ${DAYS[photo.day - 1]?.camp || ''}`;
+  document.getElementById('modal-meta').textContent    = `Day ${photo.day} · ${DAYS[photo.day - 1]?.name || ''}`;
   document.getElementById('photo-modal').classList.add('open');
 }
 
