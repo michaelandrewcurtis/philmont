@@ -137,7 +137,17 @@ function restoreRouteLayers() {
   }
   if (!map.getSource('anim-line')) {
     map.addSource('anim-line', { type: 'geojson', data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } } });
-    map.addLayer({ id: 'anim-route', type: 'line', source: 'anim-line', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#e8c46a', 'line-width': 4 } });
+    map.addLayer({ 
+      id: 'anim-route', 
+      type: 'line', 
+      source: 'anim-line',
+      layout: { 
+        'line-join': 'round', 
+        'line-cap': 'round' 
+      }, paint: { 
+        'line-color': '#0daf2e', 
+        'line-width': 6 
+      } });
   }
 
   if (activeDay) selectDay(activeDay);
@@ -375,49 +385,65 @@ function playDay(dayNum) {
     type: 'Feature', geometry: { type: 'LineString', coordinates: [] },
   });
 
-  const totalSteps = segCoords.length;
-  const msPerStep  = 600;
-  let step         = 0;
+  const totalPoints  = segCoords.length;
+  const DURATION_MS  = totalPoints * 80; // ~80ms per point — adjust to taste
+  let startTime      = null;
+
+  function lerp(a, b, t) {
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  }
 
   map.flyTo({
     center:   segCoords[0],
-    zoom:     12.5,
+    zoom:     14.5,
     pitch:    65,
-    bearing:  computeBearing(segCoords[0], segCoords[Math.min(3, totalSteps - 1)]),
+    bearing:  computeBearing(segCoords[0], segCoords[Math.min(3, totalPoints - 1)]),
     duration: 1200,
     essential: true,
   });
 
-  function tick() {
+  function tick(timestamp) {
     if (!animating) return;
-    if (step >= totalSteps) { stopAnimation(); return; }
+
+    if (!startTime) startTime = timestamp;
+    const t          = Math.min((timestamp - startTime) / DURATION_MS, 1);
+    const floatIndex = t * (totalPoints - 1);
+    const i          = Math.floor(floatIndex);
+    const frac       = floatIndex - i;
+
+    const currentPos = i >= totalPoints - 1
+      ? segCoords[totalPoints - 1]
+      : lerp(segCoords[i], segCoords[i + 1], frac);
 
     map.getSource('anim-line').setData({
       type: 'Feature',
-      geometry: { type: 'LineString', coordinates: segCoords.slice(0, step + 1) },
+      geometry: { type: 'LineString', coordinates: [...segCoords.slice(0, i + 1), currentPos] },
     });
 
-    if (step > 0 && step < totalSteps - 1) {
+    if (i < totalPoints - 1) {
       map.easeTo({
-        center:   segCoords[step],
-        bearing:  computeBearing(segCoords[step], segCoords[Math.min(step + 2, totalSteps - 1)]),
+        center:   currentPos,
+        bearing:  computeBearing(currentPos, segCoords[Math.min(i + 4, totalPoints - 1)]),
         pitch:    62,
-        zoom:     12.5,
-        duration: msPerStep * 0.9,
+        zoom:     14.5,
+        duration: 100,
         essential: true,
       });
     }
 
-    step++;
-    animFrame = setTimeout(tick, msPerStep);
+    if (t < 1) {
+      animFrame = requestAnimationFrame(tick);
+    } else {
+      stopAnimation();
+    }
   }
 
-  setTimeout(tick, 1400);
+  setTimeout(() => { if (animating) animFrame = requestAnimationFrame(tick); }, 1400);
 }
 
 function stopAnimation() {
   animating = false;
-  if (animFrame) clearTimeout(animFrame);
+  if (animFrame) cancelAnimationFrame(animFrame);
 
   document.getElementById('anim-bar').classList.remove('visible');
   document.querySelectorAll('.day-play-btn').forEach(b => b.classList.remove('playing'));
