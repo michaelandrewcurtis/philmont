@@ -399,13 +399,23 @@ function playDay(dayNum) {
   // PITCH_DESCENT: camera angle when descending (low = pulls back to reveal the drop)
   // ELEV_LOOKAHEAD: how many points ahead to sample for gradient detection
   // PITCH_SMOOTH: lerp factor per frame (lower = slower transition, higher = snappier)
-  const PITCH_CLIMB    = 72;   // degrees — steep, close to the terrain
-  const PITCH_DESCENT  = 32;   // degrees — wide, reveals what's ahead
+  const PITCH_CLIMB    = 60;   // degrees — steep, close to the terrain
+  const PITCH_DESCENT  = 20;   // degrees — wide, reveals what's ahead
   const ELEV_LOOKAHEAD = 20;   // points ahead to compare elevation
   const PITCH_SMOOTH   = 0.04; // 0–1: how fast pitch transitions between values
   // ──────────────────────────────────────────────────────────
 
-  let currentPitch = 65;
+  let currentPitch   = 60;
+
+  // ── Bearing tuning ────────────────────────────────────────
+  // BEARING_LOOKAHEAD: points ahead used to compute target heading
+  //   (higher = smoother direction, less responsive to tight turns)
+  // BEARING_SMOOTH: lerp factor per frame (lower = slower/floatier rotation)
+  const BEARING_LOOKAHEAD = 20;  // points ahead — raise to reduce jitter
+  const BEARING_SMOOTH    = 0.06; // 0–1: rotation speed per frame
+  // ──────────────────────────────────────────────────────────
+
+  let currentBearing = computeBearing(segCoords[0], segCoords[Math.min(3, totalPoints - 1)]);
 
   function lerp(a, b, t) {
     return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
@@ -451,10 +461,12 @@ function playDay(dayNum) {
     });
 
     if (i < totalPoints - 1) {
-      currentPitch = lerpNum(currentPitch, targetPitch(i), PITCH_SMOOTH);
+      currentPitch   = lerpNum(currentPitch, targetPitch(i), PITCH_SMOOTH);
+      const targetBearing = computeBearing(currentPos, segCoords[Math.min(i + BEARING_LOOKAHEAD, totalPoints - 1)]);
+      currentBearing = lerpNum(currentBearing, targetBearing, BEARING_SMOOTH);
       map.easeTo({
         center:   currentPos,
-        bearing:  computeBearing(currentPos, segCoords[Math.min(i + 8, totalPoints - 1)]),
+        bearing:  currentBearing,
         pitch:    currentPitch,
         zoom:     14.5,
         duration: 100,
