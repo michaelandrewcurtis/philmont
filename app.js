@@ -253,7 +253,7 @@ function buildSidebar() {
 }
 
 // ── DAY SELECTION ─────────────────────────────────
-function selectDay(dayNum) {
+function selectDay(dayNum, skipCamera = false) {
   // Sidebar highlight
   document.querySelectorAll('.day-item').forEach(el => el.classList.remove('active'));
   const item = document.getElementById(`day-item-${dayNum}`);
@@ -267,7 +267,7 @@ function selectDay(dayNum) {
 
   renderDayDetail(d);
   updateActiveSegment(dayNum);
-  flyToSegment(dayNum);
+  if (!skipCamera) flyToSegment(dayNum);
 }
 
 function updateActiveSegment(dayNum) {
@@ -291,7 +291,7 @@ function flyToSegment(dayNum) {
 
   if (dayNum === 1) {
     // Day 1 has no route — fly to base camp
-    map.flyTo({ center: [d.coords.lng, d.coords.lat], zoom: 13, pitch: 50, bearing: -15, duration: 1200 });
+    map.flyTo({ center: [d.coords.lng, d.coords.lat], zoom: 15, pitch: 50, bearing: -80, duration: 1200 });
   } else {
     // All other days: fly to the segment start point
     map.flyTo({ center: segCoords[0], zoom: 13, pitch: 50, bearing: -15, duration: 1200 });
@@ -364,7 +364,7 @@ function renderDayDetail(d) {
 function playDay(dayNum) {
   if (animating) stopAnimation();
 
-  selectDay(dayNum);
+  selectDay(dayNum, true); // skip camera — playDay controls it below
 
   const seg       = DAY_SEGMENTS[dayNum - 1];
   const segCoords = FULL_ROUTE.slice(seg.start, seg.end + 1);
@@ -523,8 +523,8 @@ function flyToOverview() {
   map.flyTo({
     center:   TRIP.mapCenter,
     zoom:     TRIP.mapZoom,
-    pitch:    50,
-    bearing:  -20,
+    pitch:    70,
+    bearing:  -80,
     duration: 1800,
     essential: true,
   });
