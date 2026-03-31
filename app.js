@@ -289,12 +289,14 @@ function flyToSegment(dayNum) {
   const seg       = DAY_SEGMENTS[dayNum - 1];
   const segCoords = FULL_ROUTE.slice(seg.start, seg.end + 1);
 
+  const bearing = d.startBearing !== null
+    ? d.startBearing
+    : computeBearing(segCoords[0], segCoords[Math.min(3, segCoords.length - 1)]);
+
   if (dayNum === 1) {
-    // Day 1 has no route — fly to base camp
-    map.flyTo({ center: [d.coords.lng, d.coords.lat], zoom: 15, pitch: 50, bearing: -80, duration: 1200 });
+    map.flyTo({ center: [d.coords.lng, d.coords.lat], zoom: 15, pitch: 50, bearing, duration: 1200 });
   } else {
-    // All other days: fly to the segment start point
-    map.flyTo({ center: segCoords[0], zoom: 13, pitch: 50, bearing: -15, duration: 1200 });
+    map.flyTo({ center: segCoords[0], zoom: 13, pitch: 50, bearing, duration: 1200 });
   }
 }
 
