@@ -441,7 +441,7 @@ function playDay(dayNum) {
   //   (higher = smoother direction, less responsive to tight turns)
   // BEARING_SMOOTH: lerp factor per frame (lower = slower/floatier rotation)
   const BEARING_LOOKAHEAD = 70;  // points ahead — raise to reduce jitter
-  const BEARING_SMOOTH    = 0.001; // 0–1: rotation speed per frame
+  const BEARING_SMOOTH    = 0.03; // 0–1: rotation speed per frame
   // ──────────────────────────────────────────────────────────
 
   // Use per-day startBearing from data.js if set, otherwise compute from trail direction
@@ -512,7 +512,6 @@ function playDay(dayNum) {
         center:   currentPos,
         bearing:  currentBearing,
         pitch:    currentPitch,
-        zoom:     14.5,
         duration: 100,
         essential: true,
       });
