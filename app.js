@@ -431,7 +431,7 @@ function playDay(dayNum) {
   const PITCH_CLIMB    = 50;   // degrees — steep, close to the terrain
   const PITCH_DESCENT  = 20;   // degrees — wide, reveals what's ahead
   const ELEV_LOOKAHEAD = 20;   // points ahead to compare elevation
-  const PITCH_SMOOTH   = 0.04; // 0–1: how fast pitch transitions between values
+  const PITCH_SMOOTH   = 0.06; // 0–1: how fast pitch transitions between values (lerp owns smoothing — Mapbox duration is 0)
   // ──────────────────────────────────────────────────────────
 
   let currentPitch   = 50;
@@ -440,8 +440,8 @@ function playDay(dayNum) {
   // BEARING_LOOKAHEAD: points ahead used to compute target heading
   //   (higher = smoother direction, less responsive to tight turns)
   // BEARING_SMOOTH: lerp factor per frame (lower = slower/floatier rotation)
-  const BEARING_LOOKAHEAD = 70;  // points ahead — raise to reduce jitter
-  const BEARING_SMOOTH    = 0.03; // 0–1: rotation speed per frame
+  const BEARING_LOOKAHEAD = 100;  // points ahead — raise to reduce jitter
+  const BEARING_SMOOTH    = 0.01; // 0–1: rotation speed per frame
   // ──────────────────────────────────────────────────────────
 
   // Use per-day startBearing from data.js if set, otherwise compute from trail direction
@@ -512,7 +512,7 @@ function playDay(dayNum) {
         center:   currentPos,
         bearing:  currentBearing,
         pitch:    currentPitch,
-        duration: 100,
+        duration: 0,   // smoothing handled by lerp above — duration > 0 fights rAF updates
         essential: true,
       });
     }
