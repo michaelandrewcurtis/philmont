@@ -6,12 +6,13 @@
 
 // ── STATE ─────────────────────────────────────────
 let map;
-let activeDay  = null;
-let animating  = false;
-let animFrame  = null;
-let terrainOn  = true;
-let satelliteOn = true;
-let elevChart  = null;
+let activeDay      = null;
+let animating      = false;
+let animFrame      = null;
+let terrainOn      = true;
+let satelliteOn    = true;
+let elevChart      = null;
+let progressMarker = null;
 
 // ── INIT ──────────────────────────────────────────
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -384,6 +385,34 @@ function playDay(dayNum) {
   const pb = document.getElementById(`play-btn-${dayNum}`);
   if (pb) pb.classList.add('playing');
 
+  // Progress dot on map
+  if (progressMarker) progressMarker.remove();
+  const dotEl = document.createElement('div');
+  Object.assign(dotEl.style, {
+    width: '14px', height: '14px', borderRadius: '50%',
+    background: '#e8c46a', border: '2px solid #fff',
+    boxShadow: '0 0 6px rgba(232,196,106,0.8)',
+    pointerEvents: 'none',
+  });
+  progressMarker = new mapboxgl.Marker({ element: dotEl, anchor: 'center' })
+    .setLngLat(segCoords[0])
+    .addTo(map);
+
+  // Progress dot on elevation chart — sparse array mutated each tick
+  if (elevChart) {
+    const elevDotData = new Array(ELEV_PROFILE.length).fill(null);
+    elevDotData[seg.start] = ELEV_PROFILE[seg.start];
+    elevChart.data.datasets[1] = {
+      data:            elevDotData,
+      borderColor:     '#e8c46a',
+      backgroundColor: '#e8c46a',
+      pointRadius:     5,
+      pointHoverRadius: 5,
+      showLine:        false,
+    };
+    elevChart.update('none');
+  }
+
   // Clear active segment — anim-line takes over during playback
   map.getSource('active-segment').setData({
     type: 'Feature', geometry: { type: 'LineString', coordinates: [] },
@@ -399,13 +428,13 @@ function playDay(dayNum) {
   // PITCH_DESCENT: camera angle when descending (low = pulls back to reveal the drop)
   // ELEV_LOOKAHEAD: how many points ahead to sample for gradient detection
   // PITCH_SMOOTH: lerp factor per frame (lower = slower transition, higher = snappier)
-  const PITCH_CLIMB    = 65;   // degrees — steep, close to the terrain
+  const PITCH_CLIMB    = 50;   // degrees — steep, close to the terrain
   const PITCH_DESCENT  = 20;   // degrees — wide, reveals what's ahead
   const ELEV_LOOKAHEAD = 20;   // points ahead to compare elevation
   const PITCH_SMOOTH   = 0.04; // 0–1: how fast pitch transitions between values
   // ──────────────────────────────────────────────────────────
 
-  let currentPitch   = 65;
+  let currentPitch   = 50;
 
   // ── Bearing tuning ────────────────────────────────────────
   // BEARING_LOOKAHEAD: points ahead used to compute target heading
@@ -464,6 +493,17 @@ function playDay(dayNum) {
       geometry: { type: 'LineString', coordinates: [...segCoords.slice(0, i + 1), currentPos] },
     });
 
+    // Move progress dots
+    if (progressMarker) progressMarker.setLngLat(currentPos);
+    if (elevChart && elevChart.data.datasets[1]) {
+      const dotData    = elevChart.data.datasets[1].data;
+      const prevIndex  = dotData.indexOf(dotData.find(v => v !== null));
+      const elevIndex  = Math.min(seg.start + i, ELEV_PROFILE.length - 1);
+      if (prevIndex !== -1) dotData[prevIndex] = null;
+      dotData[elevIndex] = ELEV_PROFILE[elevIndex];
+      elevChart.update('none');
+    }
+
     if (i < totalPoints - 1) {
       currentPitch   = lerpNum(currentPitch, targetPitch(i), PITCH_SMOOTH);
       const targetBearing = computeBearing(currentPos, segCoords[Math.min(i + BEARING_LOOKAHEAD, totalPoints - 1)]);
@@ -506,6 +546,13 @@ function stopAnimation() {
     map.getSource('anim-line').setData({
       type: 'Feature', geometry: { type: 'LineString', coordinates: [] },
     });
+  }
+
+  // Remove progress dots
+  if (progressMarker) { progressMarker.remove(); progressMarker = null; }
+  if (elevChart && elevChart.data.datasets[1]) {
+    elevChart.data.datasets.splice(1, 1);
+    elevChart.update('none');
   }
 }
 
