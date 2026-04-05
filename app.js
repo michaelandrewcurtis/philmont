@@ -195,32 +195,52 @@ function addCampMarkers() {
 // ── PHOTO MARKERS ─────────────────────────────────
 function addPhotoMarkers() {
   PHOTOS.forEach((photo, i) => {
+    if (photo.lat == null || photo.lng == null) return;
+
     const el = document.createElement('div');
     Object.assign(el.style, {
-      width:        '28px',
-      height:       '28px',
-      borderRadius: '50%',
-      background:   '#1a1410',
-      border:       '2px solid #c9972a',
-      cursor:       'pointer',
-      display:      'flex',
-      alignItems:   'center',
-      justifyContent: 'center',
-      fontSize:     '12px',
-      transition:   'transform 0.2s',
-      boxShadow:    '0 2px 6px rgba(0,0,0,0.5)',
+      width:           '28px',
+      height:          '28px',
+      borderRadius:    '50%',
+      background:      '#1a1410',
+      border:          '2px solid #c9972a',
+      cursor:          'pointer',
+      display:         'flex',
+      alignItems:      'center',
+      justifyContent:  'center',
+      fontSize:        '12px',
+      transformOrigin: 'center',
+      transition:      'transform 0.2s',
+      boxShadow:       '0 2px 6px rgba(0,0,0,0.5)',
     });
-    el.innerHTML  = '📷';
-    el.title      = photo.title;
+    el.innerHTML = '📷';
 
-    el.addEventListener('mouseenter', () => el.style.transform = 'scale(1.3)');
-    el.addEventListener('mouseleave', () => el.style.transform = 'scale(1)');
-    el.addEventListener('click',      () => openModal(PHOTOS[i]));
+    // Hover popup with thumbnail
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      offset: 16,
+      className: 'photo-hover-popup',
+    });
+    const caption = photo.caption || photo.url.split('/').pop();
+    popup.setHTML(`<img src="${photo.url}" style="width:160px;height:110px;object-fit:cover;display:block;border-radius:2px;">
+      ${caption ? `<div style="padding:4px 6px;font-size:11px;color:#f5f0e8;max-width:160px;">${caption}</div>` : ''}`);
 
-    if (photo.lat == null || photo.lng == null) return;
+    el.addEventListener('mouseenter', () => {
+      el.style.transform = 'scale(1.3)';
+      popup.addTo(map);
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = 'scale(1)';
+      popup.remove();
+    });
+    el.addEventListener('click', () => openModal(PHOTOS[i]));
+
     new mapboxgl.Marker({ element: el })
       .setLngLat([photo.lng, photo.lat])
       .addTo(map);
+
+    popup.setLngLat([photo.lng, photo.lat]);
   });
 }
 
@@ -320,8 +340,8 @@ function renderDayDetail(d) {
   const photoGrid = dayPhotos.length
     ? dayPhotos.map(p => `
         <div class="photo-thumb" onclick="openModal(PHOTOS[${p._idx}])">
-          ${p.thumb
-            ? `<img src="${p.thumb}" alt="${p.title}">`
+          ${p.url
+            ? `<img src="${p.url}" alt="${p.caption || ''}">`
             : '<div class="photo-thumb-empty">📷</div>'}
         </div>`).join('')
     : `<div style="font-size:10px;color:var(--stone);font-style:italic;grid-column:1/-1;padding:4px 0;font-weight:300;">
@@ -669,10 +689,10 @@ function openModal(photo) {
     + '<text x="300" y="250" fill="#7a7065" text-anchor="middle" font-size="16" font-family="serif">Photo coming soon</text>'
     + '</svg>');
 
-  document.getElementById('modal-img').src      = photo.url || PLACEHOLDER;
-  document.getElementById('modal-title').textContent   = photo.title;
-  document.getElementById('modal-caption').textContent = photo.caption || '';
-  document.getElementById('modal-meta').textContent    = `Day ${photo.day} · ${DAYS[photo.day - 1]?.name || ''}`;
+  document.getElementById('modal-img').src             = photo.url || PLACEHOLDER;
+  document.getElementById('modal-title').textContent   = photo.caption || '';
+  document.getElementById('modal-caption').textContent = photo.author || '';
+  document.getElementById('modal-meta').textContent    = photo.day ? `Day ${photo.day} · ${DAYS[photo.day - 1]?.name || ''}` : '';
   document.getElementById('photo-modal').classList.add('open');
 }
 

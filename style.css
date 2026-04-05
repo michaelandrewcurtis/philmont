@@ -112,30 +112,33 @@ body {
   line-height: 1;
 }
 
-#header-title .eyebrow {
-  font-size: 9px;
-  letter-spacing: 0.25em;
+/* #header-title .eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--gold);
   font-family: 'Source Serif 4', serif;
   font-weight: 300;
   margin-bottom: 3px;
-}
+  display:inline;
+}*/
 
 #header-title h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 900;
   letter-spacing: 0.02em;
   color: var(--parchment);
+  margin:8px 0;
+
 }
 
 #header-title .sub {
   font-size: 10px;
   color: var(--stone-light);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-bottom: 2px;
   font-weight: 300;
 }
 
@@ -587,9 +590,9 @@ body {
 #photo-modal-inner {
   background: var(--ink);
   border: 1px solid var(--stone);
-  max-width: 700px;
-  width: 90%;
-  max-height: 85vh;
+  max-width: 94vw;
+  width: 94vw;
+  max-height: 94vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -598,7 +601,8 @@ body {
 
 #modal-img {
   width: 100%;
-  max-height: 480px;
+  flex: 1;
+  min-height: 0;
   object-fit: contain;
   background: #000;
 }
@@ -663,6 +667,16 @@ body {
 }
 
 .camp-popup .mapboxgl-popup-tip { border-top-color: var(--stone) !important; }
+
+.photo-hover-popup .mapboxgl-popup-content {
+  background: var(--ink);
+  border: 1px solid var(--stone);
+  padding: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.photo-hover-popup .mapboxgl-popup-tip { border-top-color: var(--stone) !important; }
 
 .popup-day {
   font-size: 9px;
