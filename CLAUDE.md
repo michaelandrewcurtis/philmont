@@ -9,11 +9,14 @@ Interactive Mapbox GL JS trip journal for a 12-day Philmont Scout Ranch trek.
 
 ```
 philmont-2025/
-├── index.html   — markup shell only; no inline styles or logic
-├── style.css    — all design tokens, layout, and component styles
-├── app.js       — all map logic, sidebar, animation, elevation chart, modal
-├── data.js      — all trip data (edit this file to update content)
-└── CLAUDE.md    — this file
+├── index.html              — markup shell only; no inline styles or logic
+├── style.css               — all design tokens, layout, and component styles
+├── app.js                  — all map logic, sidebar, animation, elevation chart, modal
+├── data.js                 — trip data: TRIP, DAYS, FULL_ROUTE, DAY_SEGMENTS, ELEV_PROFILE
+├── photos.js               — PHOTOS array (132 photos with GPS, day, caption, author)
+├── caption-tool.html       — standalone visual caption editor (open in browser, no server needed)
+├── philmont-photos-forweb/ — resized web-ready images referenced by photos.js
+└── CLAUDE.md               — this file
 ```
 
 ### Key rule: data vs. logic separation
@@ -171,9 +174,11 @@ Mapbox token is a public token (safe to commit). For production, restrict the to
 - [x] Replace `FULL_ROUTE` with real GPX-derived coordinates
 - [x] Update `DAY_SEGMENTS` index ranges to match real GPS data
 - [x] Replace `ELEV_PROFILE` with GPX elevation data
-- [ ] Add real photo URLs to `PHOTOS[]` in `data.js`
+- [x] Add real photo URLs to `PHOTOS[]` — moved to `photos.js`, 132 photos with GPS from EXIF
 - [ ] Write real crew narratives in `DAYS[].narrative` (current text is AI-drafted)
 - [ ] Update the scout count in `index.html` header stats (currently "13")
 - [ ] Restrict Mapbox token to GitHub Pages domain
 - [ ] Consider a `photos/` subfolder for locally hosted images
 - [ ] Mobile responsive layout (sidebar collapses on small screens)
+- [ ] Update `coords` and `startBearing` for each day in `DAYS[]`
+- [ ] Add a marker/point on the elevation chart representing the selected day's camp elevation

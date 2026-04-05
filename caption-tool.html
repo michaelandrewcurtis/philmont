@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Philmont Caption Tool</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #111; color: #eee; height: 100vh; display: flex; flex-direction: column; }
+
+    #toolbar {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    #toolbar h1 { font-size: 15px; font-weight: 600; color: #c9972a; flex: 1; }
+    #progress { font-size: 12px; color: #888; }
+    #toolbar button {
+      background: #2a2a2a; border: 1px solid #444; color: #eee;
+      padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px;
+    }
+    #toolbar button:hover { background: #3a3a3a; }
+    #btn-export { background: #8b3a1a; border-color: #c4622d; color: #fff; }
+    #btn-export:hover { background: #a04420; }
+
+    #main { display: flex; flex: 1; overflow: hidden; }
+
+    /* Left: photo grid */
+    #grid {
+      width: 220px;
+      flex-shrink: 0;
+      overflow-y: auto;
+      background: #181818;
+      border-right: 1px solid #333;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .thumb {
+      position: relative;
+      cursor: pointer;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+    }
+    .thumb.active { border-color: #c9972a; }
+    .thumb.has-caption::after {
+      content: '✓';
+      position: absolute;
+      top: 3px; right: 4px;
+      font-size: 11px;
+      color: #4caf50;
+      font-weight: bold;
+    }
+    .thumb img { width: 100%; height: 80px; object-fit: cover; display: block; }
+    .thumb-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.6);
+      font-size: 9px;
+      color: #ccc;
+      padding: 2px 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Center: large preview */
+    #preview {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d0d0d;
+      overflow: hidden;
+      position: relative;
+    }
+    #preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    #nav-prev, #nav-next {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      border: none; color: #fff;
+      font-size: 24px; cursor: pointer;
+      padding: 12px 8px;
+      border-radius: 4px;
+    }
+    #nav-prev { left: 8px; }
+    #nav-next { right: 8px; }
+
+    /* Right: edit panel */
+    #panel {
+      width: 280px;
+      flex-shrink: 0;
+      background: #1a1a1a;
+      border-left: 1px solid #333;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    #panel h2 { font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+    #panel label { font-size: 12px; color: #aaa; display: block; margin-bottom: 4px; }
+    #panel input, #panel textarea, #panel select {
+      width: 100%;
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: #eee;
+      font-size: 13px;
+      padding: 7px 9px;
+      font-family: inherit;
+    }
+    #panel textarea { resize: vertical; min-height: 80px; }
+    #panel input:focus, #panel textarea:focus, #panel select:focus {
+      outline: none; border-color: #c9972a;
+    }
+    .meta-row { font-size: 11px; color: #666; word-break: break-all; }
+    .meta-row span { color: #888; }
+    #btn-save {
+      background: #2d4a2d; border: 1px solid #4a7a4a; color: #a8d8a8;
+      padding: 8px; border-radius: 4px; cursor: pointer; font-size: 13px; width: 100%;
+    }
+    #btn-save:hover { background: #3a5e3a; }
+
+    /* Export modal */
+    #export-modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    #export-modal.visible { display: flex; }
+    #export-box {
+      background: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 20px;
+      width: 700px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #export-box h2 { font-size: 14px; color: #c9972a; }
+    #export-box p { font-size: 12px; color: #888; }
+    #export-out {
+      flex: 1;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #a8d8a8;
+      font-family: monospace;
+      font-size: 11px;
+      padding: 12px;
+      overflow-y: auto;
+      white-space: pre;
+      max-height: 50vh;
+    }
+    #export-box .btns { display: flex; gap: 8px; }
+    #export-box .btns button {
+      background: #2a2a2a; border: 1px solid #444; color: #eee;
+      padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 13px;
+    }
+    #btn-copy { background: #8b3a1a !important; border-color: #c4622d !important; }
+  </style>
+</head>
+<body>
+
+<div id="toolbar">
+  <h1>Philmont Caption Tool</h1>
+  <span id="progress">—</span>
+  <button id="btn-uncaptioned">Show uncaptioned</button>
+  <button id="btn-all">Show all</button>
+  <button id="btn-export">Export photos.js</button>
+</div>
+
+<div id="main">
+  <div id="grid"></div>
+  <div id="preview">
+    <img id="preview-img" src="" alt="">
+    <button id="nav-prev">&#8249;</button>
+    <button id="nav-next">&#8250;</button>
+  </div>
+  <div id="panel">
+    <h2>Edit</h2>
+    <div>
+      <label>Day</label>
+      <select id="edit-day">
+        <option value="null">— unknown —</option>
+        <option value="1">Day 1 · Camping HQ</option>
+        <option value="2">Day 2 · Toothache Springs</option>
+        <option value="3">Day 3 · Magpie</option>
+        <option value="4">Day 4 · Miners Park</option>
+        <option value="5">Day 5 · Black Mountain</option>
+        <option value="6">Day 6 · Divide</option>
+        <option value="7">Day 7 · Lamberts Mine</option>
+        <option value="8">Day 8 · Cimarroncito</option>
+        <option value="9">Day 9 · Cimarroncito Layover</option>
+        <option value="10">Day 10 · Clarks Fork</option>
+        <option value="11">Day 11 · Tooth Ridge</option>
+        <option value="12">Day 12 · Camping HQ</option>
+      </select>
+    </div>
+    <div>
+      <label>Caption</label>
+      <textarea id="edit-caption" placeholder="Enter caption…"></textarea>
+    </div>
+    <div>
+      <label>Author</label>
+      <input id="edit-author" type="text" placeholder="e.g. Michael Andrew Curtis">
+    </div>
+    <button id="btn-save">Save &amp; Next →</button>
+    <hr style="border-color:#333">
+    <h2>Metadata</h2>
+    <div class="meta-row"><span>File: </span><span id="meta-file">—</span></div>
+    <div class="meta-row"><span>GPS: </span><span id="meta-gps">—</span></div>
+  </div>
+</div>
+
+<div id="export-modal">
+  <div id="export-box">
+    <h2>Export — copy this into photos.js</h2>
+    <p>Replace the entire PHOTOS array in photos.js with this output.</p>
+    <div id="export-out"></div>
+    <div class="btns">
+      <button id="btn-copy">Copy to clipboard</button>
+      <button id="btn-close-export">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="photos.js"></script>
+<script>
+// Working copy — loaded from photos.js, edits saved here in memory
+const data = PHOTOS.map((p, i) => ({ ...p, _idx: i }));
+let filtered = [...data];
+let current  = 0;
+let showAll  = true;
+
+function updateFiltered() {
+  filtered = showAll ? [...data] : data.filter(p => !p.caption);
+  current  = Math.min(current, filtered.length - 1);
+}
+
+function updateProgress() {
+  const captioned = data.filter(p => p.caption).length;
+  document.getElementById('progress').textContent =
+    `${captioned} / ${data.length} captioned`;
+}
+
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  filtered.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb' + (p.caption ? ' has-caption' : '') + (i === current ? ' active' : '');
+    div.innerHTML = `<img loading="lazy" src="${p.url}"><div class="thumb-label">${p.url.split('/').pop()}</div>`;
+    div.addEventListener('click', () => { current = i; render(); });
+    grid.appendChild(div);
+  });
+}
+
+function scrollGridToCurrent() {
+  const grid = document.getElementById('grid');
+  const thumbs = grid.querySelectorAll('.thumb');
+  if (thumbs[current]) thumbs[current].scrollIntoView({ block: 'nearest' });
+}
+
+function render() {
+  if (!filtered.length) return;
+  const p = filtered[current];
+
+  document.getElementById('preview-img').src = p.url;
+  document.getElementById('edit-day').value    = p.day ?? 'null';
+  document.getElementById('edit-caption').value = p.caption || '';
+  document.getElementById('edit-author').value  = p.author || '';
+  document.getElementById('meta-file').textContent = p.url.split('/').pop();
+  document.getElementById('meta-gps').textContent  = p.lat ? `${p.lat}, ${p.lng}` : 'no GPS';
+
+  // Sync grid highlight
+  document.querySelectorAll('.thumb').forEach((el, i) => {
+    el.classList.toggle('active', i === current);
+  });
+  scrollGridToCurrent();
+  updateProgress();
+}
+
+function saveCurrentEdits() {
+  if (!filtered.length) return;
+  const p   = filtered[current];
+  const orig = data[p._idx];
+  orig.caption = document.getElementById('edit-caption').value.trim();
+  orig.author  = document.getElementById('edit-author').value.trim();
+  const dayVal = document.getElementById('edit-day').value;
+  orig.day     = dayVal === 'null' ? null : parseInt(dayVal);
+  // Sync back to filtered
+  p.caption = orig.caption;
+  p.author  = orig.author;
+  p.day     = orig.day;
+  // Update thumb badge
+  const thumbs = document.querySelectorAll('.thumb');
+  if (thumbs[current]) thumbs[current].classList.toggle('has-caption', !!orig.caption);
+}
+
+document.getElementById('btn-save').addEventListener('click', () => {
+  saveCurrentEdits();
+  if (current < filtered.length - 1) current++;
+  buildGrid();
+  render();
+});
+
+document.getElementById('nav-prev').addEventListener('click', () => {
+  saveCurrentEdits();
+  if (current > 0) { current--; buildGrid(); render(); }
+});
+document.getElementById('nav-next').addEventListener('click', () => {
+  saveCurrentEdits();
+  if (current < filtered.length - 1) { current++; buildGrid(); render(); }
+});
+
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    saveCurrentEdits();
+    if (current < filtered.length - 1) { current++; buildGrid(); render(); }
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    saveCurrentEdits();
+    if (current > 0) { current--; buildGrid(); render(); }
+  }
+});
+
+document.getElementById('btn-all').addEventListener('click', () => {
+  saveCurrentEdits(); showAll = true; updateFiltered(); buildGrid(); render();
+});
+document.getElementById('btn-uncaptioned').addEventListener('click', () => {
+  saveCurrentEdits(); showAll = false; updateFiltered(); buildGrid(); render();
+});
+
+// Export
+document.getElementById('btn-export').addEventListener('click', () => {
+  saveCurrentEdits();
+  const lines = data.map(p => {
+    const author = p.author ? `\n    author:  ${JSON.stringify(p.author)},` : '';
+    return `  {
+    url:     ${JSON.stringify(p.url)},
+    lat:     ${p.lat ?? 'null'},
+    lng:     ${p.lng ?? 'null'},
+    day:     ${p.day ?? 'null'},
+    caption: ${JSON.stringify(p.caption || '')},${author}
+  }`;
+  });
+  const out = '// ============================================================\n'
+    + '// photos.js — Philmont 2025 Photo Data\n'
+    + '// Edit captions here, or use caption-tool.html for visual editing.\n'
+    + '// ============================================================\n\n'
+    + 'const PHOTOS = [\n' + lines.join(',\n') + '\n];\n';
+  document.getElementById('export-out').textContent = out;
+  document.getElementById('export-modal').classList.add('visible');
+});
+document.getElementById('btn-copy').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('export-out').textContent)
+    .then(() => { document.getElementById('btn-copy').textContent = 'Copied!'; setTimeout(() => { document.getElementById('btn-copy').textContent = 'Copy to clipboard'; }, 2000); });
+});
+document.getElementById('btn-close-export').addEventListener('click', () => {
+  document.getElementById('export-modal').classList.remove('visible');
+});
+
+// Init
+updateFiltered();
+buildGrid();
+render();
+</script>
+</body>
+</html>

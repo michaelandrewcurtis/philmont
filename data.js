@@ -14,10 +14,10 @@ const TRIP = {
   dates: "June 22 – July 3, 2025",
   totalMiles: 62,
   totalDays: 12,
-  mapCenter: [-105.07, 36.44],
-  mapZoom: 10.5,
-  mapPitch: 55,
-  mapBearing: -20,
+  mapCenter: [-104.96, 36.45],
+  mapZoom: 11,
+  mapPitch: 50,
+  mapBearing: -80,
   terrainExaggeration: 1.6,
 };
 
@@ -1058,15 +1058,15 @@ const DAY_SEGMENTS = [
   { start: 0,    end: 0    },  // Day 1:  Camping HQ (no hike)
   { start: 0,    end: 137   },  // Day 2:  Zastrow TH → Toothache Springs
   { start: 137,   end: 520   },  // Day 3:  Toothache Springs → Magpie
-  { start: 520,   end: 924   },  // Day 4:  Magpie → Miners Park
-  { start: 924,   end: 1232   },  // Day 5:  Miners Park → Black Mountain
-  { start: 1232,   end: 1661   },  // Day 6:  Black Mountain → Divide
-  { start: 1661,   end: 2464   },  // Day 7:  Divide → Lamberts Mine
-  { start: 2464,   end: 2772   },  // Day 8:  Lamberts Mine → Cimarroncito
-  { start: 2772,   end: 3387  },  // Day 9:  Cimarroncito (layover loop)
-  { start: 3387,  end: 3696  },  // Day 10: Cimarroncito → Clarks Fork
-  { start: 3696,  end: 5545  },  // Day 11: Clarks Fork → Tooth Ridge
-  { start: 5545,  end: 6162  },  // Day 12: Tooth Ridge → Camping HQ
+  { start: 520,   end: 1064   },  // Day 4:  Magpie → Miners Park
+  { start: 1064,   end: 1708   },  // Day 5:  Miners Park → Black Mountain
+  { start: 1708,   end: 2230   },  // Day 6:  Black Mountain → Divide
+  { start: 2230,   end: 3005   },  // Day 7:  Divide → Lamberts Mine
+  { start: 3005,   end: 3455   },  // Day 8:  Lamberts Mine → Cimarroncito
+  { start: 3455,   end: 3950  },  // Day 9:  Cimarroncito (layover loop)
+  { start: 3975,  end: 4430  },  // Day 10: Cimarroncito → Clarks Fork
+  { start: 4431,  end: 5245  },  // Day 11: Clarks Fork → Tooth Ridge
+  { start: 5245,  end: 6162  },  // Day 12: Tooth Ridge → Camping HQ
 ];
 
 // ── Elevation profile (ft) matching FULL_ROUTE ────────────
@@ -1591,9 +1591,9 @@ const ELEV_PROFILE = [
 const DAYS = [
   {
     day: 1, name: "Camping HQ", subtitle: "Arrival Day",
-    startBearing: null,  // degrees 0–360, or null to auto-compute from trail direction
+    startBearing: -80,  // degrees 0–360, or null to auto-compute from trail direction
     miles: 0, gain: 0, loss: 0, elevation: 6920,
-    coords: { lat: 36.38063, lng: -104.98593 },
+    coords: { lat: 36.4529, lng: -104.96 },
     type: "staffed",
     features: ["Opening Campfire", "Ranger Check-in", "Kit Inspection"],
     narrative: "The crew arrives at Philmont Scout Ranch and settles into base camp. Tonight's Opening Campfire kicks off twelve days of high-country adventure. Gear sorted, rangers met — tomorrow the backcountry begins.",
@@ -1601,7 +1601,7 @@ const DAYS = [
   },
   {
     day: 2, name: "Toothache Springs", subtitle: "Day 2 · Ranger Training",
-    startBearing: null,
+    startBearing: 0,
     miles: 4.7, gain: 958, loss: 0, elevation: 7969,
     coords: { lat: 36.40915, lng: -104.99061 },
     type: "trail",
@@ -1611,7 +1611,7 @@ const DAYS = [
   },
   {
     day: 3, name: "Magpie", subtitle: "Day 3 · Dry Camp",
-    startBearing: null,
+    startBearing: 0,
     miles: 3.9, gain: 744, loss: 1129, elevation: 7082,
     coords: { lat: 36.43366, lng: -104.99153 },
     type: "dry",
@@ -1621,7 +1621,7 @@ const DAYS = [
   },
   {
     day: 4, name: "Miners Park", subtitle: "Day 4 · High COPE & Climbing",
-    startBearing: null,
+    startBearing: -100,
     miles: 5.0, gain: 1480, loss: 0, elevation: 7608,
     coords: { lat: 36.42050, lng: -105.02032 },
     type: "staffed",
@@ -1631,7 +1631,7 @@ const DAYS = [
   },
   {
     day: 5, name: "Black Mountain", subtitle: "Day 5 · Trail Building",
-    startBearing: null,
+    startBearing: -80,
     miles: 5.1, gain: 1475, loss: 0, elevation: 8136,
     coords: { lat: 36.43583, lng: -105.04069 },
     type: "trail",
@@ -1641,7 +1641,7 @@ const DAYS = [
   },
   {
     day: 6, name: "Divide", subtitle: "Day 6 · Bonito Peak · Dry Camp",
-    startBearing: null,
+    startBearing: -40,
     miles: 4.2, gain: 2492, loss: 0, elevation: 8889,
     coords: { lat: 36.43910, lng: -105.08929 },
     type: "dry",
@@ -1651,7 +1651,7 @@ const DAYS = [
   },
   {
     day: 7, name: "Lamberts Mine", subtitle: "Day 7 · Mt. Phillips Option · Longest Day",
-    startBearing: null,
+    startBearing: 0,
     miles: 10.1, gain: 1738, loss: 3321, elevation: 11637,
     coords: { lat: 36.47675, lng: -105.15639 },
     type: "staffed",
@@ -1661,7 +1661,7 @@ const DAYS = [
   },
   {
     day: 8, name: "Cimarroncito", subtitle: "Day 8 · Rock Climbing",
-    startBearing: null,
+    startBearing: 100,
     miles: 4.1, gain: 424, loss: 0, elevation: 9945,
     coords: { lat: 36.48607, lng: -105.12772 },
     type: "staffed",
@@ -1711,9 +1711,4 @@ const DAYS = [
   },
 ];
 
-// ── Photo markers ─────────────────────────────────────────
-// Add entries after uploading photos to WordPress or hosting provider.
-// Format: { lat, lng, url, caption, day }
-const PHOTOS = [
-  // { lat: 36.4768, lng: -105.1564, url: "https://yoursite.com/.../mt-phillips.jpg", caption: "Summit of Mt. Phillips, 11,742ft", day: 7 },
-];
+// PHOTOS array has moved to photos.js — edit captions there, or use caption-tool.html
