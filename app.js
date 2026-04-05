@@ -217,8 +217,9 @@ function addPhotoMarkers() {
     el.addEventListener('mouseleave', () => el.style.transform = 'scale(1)');
     el.addEventListener('click',      () => openModal(PHOTOS[i]));
 
+    if (photo.lat == null || photo.lng == null) return;
     new mapboxgl.Marker({ element: el })
-      .setLngLat(photo.coords)
+      .setLngLat([photo.lng, photo.lat])
       .addTo(map);
   });
 }
@@ -428,9 +429,9 @@ function playDay(dayNum) {
   // PITCH_DESCENT: camera angle when descending (low = pulls back to reveal the drop)
   // ELEV_LOOKAHEAD: how many points ahead to sample for gradient detection
   // PITCH_SMOOTH: lerp factor per frame (lower = slower transition, higher = snappier)
-  const PITCH_CLIMB    = 50;   // degrees — steep, close to the terrain
+  const PITCH_CLIMB    = 40;   // degrees — steep, close to the terrain
   const PITCH_DESCENT  = 20;   // degrees — wide, reveals what's ahead
-  const ELEV_LOOKAHEAD = 20;   // points ahead to compare elevation
+  const ELEV_LOOKAHEAD = 100;   // points ahead to compare elevation
   const PITCH_SMOOTH   = 0.06; // 0–1: how fast pitch transitions between values (lerp owns smoothing — Mapbox duration is 0)
   // ──────────────────────────────────────────────────────────
 
@@ -440,8 +441,8 @@ function playDay(dayNum) {
   // BEARING_LOOKAHEAD: points ahead used to compute target heading
   //   (higher = smoother direction, less responsive to tight turns)
   // BEARING_SMOOTH: lerp factor per frame (lower = slower/floatier rotation)
-  const BEARING_LOOKAHEAD = 100;  // points ahead — raise to reduce jitter
-  const BEARING_SMOOTH    = 0.01; // 0–1: rotation speed per frame
+  const BEARING_LOOKAHEAD = 150;  // points ahead — raise to reduce jitter
+  const BEARING_SMOOTH    = 0.005; // 0–1: rotation speed per frame
   // ──────────────────────────────────────────────────────────
 
   // Use per-day startBearing from data.js if set, otherwise compute from trail direction
