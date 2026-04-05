@@ -197,14 +197,18 @@ function addPhotoMarkers() {
   PHOTOS.forEach((photo, i) => {
     if (photo.lat == null || photo.lng == null) return;
 
+    // Outer el is owned by Mapbox for positioning — never set transform on it
     const el = document.createElement('div');
-    Object.assign(el.style, {
+    Object.assign(el.style, { width: '28px', height: '28px', cursor: 'pointer' });
+
+    // Inner icon — scale this, not the outer el
+    const icon = document.createElement('div');
+    Object.assign(icon.style, {
       width:           '28px',
       height:          '28px',
       borderRadius:    '50%',
       background:      '#1a1410',
       border:          '2px solid #c9972a',
-      cursor:          'pointer',
       display:         'flex',
       alignItems:      'center',
       justifyContent:  'center',
@@ -213,7 +217,8 @@ function addPhotoMarkers() {
       transition:      'transform 0.2s',
       boxShadow:       '0 2px 6px rgba(0,0,0,0.5)',
     });
-    el.innerHTML = '📷';
+    icon.innerHTML = '📷';
+    el.appendChild(icon);
 
     // Hover popup with thumbnail
     const popup = new mapboxgl.Popup({
@@ -226,14 +231,8 @@ function addPhotoMarkers() {
     popup.setHTML(`<img src="${photo.url}" style="width:160px;height:110px;object-fit:cover;display:block;border-radius:2px;">
       ${caption ? `<div style="padding:4px 6px;font-size:11px;color:#f5f0e8;max-width:160px;">${caption}</div>` : ''}`);
 
-    el.addEventListener('mouseenter', () => {
-      el.style.transform = 'scale(1.3)';
-      popup.addTo(map);
-    });
-    el.addEventListener('mouseleave', () => {
-      el.style.transform = 'scale(1)';
-      popup.remove();
-    });
+    el.addEventListener('mouseenter', () => { icon.style.transform = 'scale(1.3)'; popup.addTo(map); });
+    el.addEventListener('mouseleave', () => { icon.style.transform = 'scale(1)';   popup.remove();   });
     el.addEventListener('click', () => openModal(PHOTOS[i]));
 
     new mapboxgl.Marker({ element: el })
