@@ -8,11 +8,35 @@
 let map;
 let activeDay      = null;
 let animating      = false;
+let animPaused     = false;
 let animFrame      = null;
+let animPausedAt   = 0;   // elapsed ms at the moment of pause
+let animStartTime  = null; // rAF timestamp when animation started (adjusted for resume)
+let animTick       = null; // reference to current tick function for resume
 let terrainOn      = true;
 let satelliteOn    = true;
 let elevChart      = null;
 let progressMarker = null;
+let _cameraPinImg  = null;
+
+// ── CAMERA PIN ICON ───────────────────────────────
+// Cleaned SVG from Illustrator — artifact paths/rect removed, styles inlined
+const CAMERA_PIN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+  <path fill="#fff" d="M364.32,599.52l159.77-153.21c41.13-39.44,13.21-108.89-43.77-108.89H159.69c-57.09,0-84.95,69.66-43.62,109.04l160.86,153.21c24.49,23.32,62.98,23.25,87.39-.15Z"/>
+  <circle fill="#c9972a" stroke="#fff" stroke-miterlimit="10" stroke-width="50" cx="319.78" cy="284.75" r="238.75"/>
+  <path fill="#fff" d="M269.71,181.15l-4.98,14.94h-35.77c-16.9,0-30.65,13.74-30.65,30.65v122.59c0,16.9,13.74,30.65,30.65,30.65h183.89c16.9,0,30.65-13.74,30.65-30.65v-122.59c0-16.9-13.74-30.65-30.65-30.65h-35.77l-4.98-14.94c-3.11-9.39-11.88-15.71-21.79-15.71h-58.81c-9.91,0-18.68,6.32-21.79,15.71ZM320.9,242.06c25.38,0,45.97,20.59,45.97,45.97s-20.59,45.97-45.97,45.97-45.97-20.59-45.97-45.97,20.59-45.97,45.97-45.97Z"/>
+</svg>`;
+
+function loadCameraPin(callback) {
+  if (_cameraPinImg && map.hasImage('camera-pin')) { callback(); return; }
+  const img = new Image(40, 40);
+  img.onload = () => {
+    if (!map.hasImage('camera-pin')) map.addImage('camera-pin', img);
+    _cameraPinImg = img;
+    callback();
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(CAMERA_PIN_SVG);
+}
 
 // ── INIT ──────────────────────────────────────────
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -58,8 +82,7 @@ function onMapLoad() {
   });
 
   addRouteLayers();
-  addCampMarkers();
-  addPhotoMarkers();
+  loadCameraPin(addPhotoMarkers);
   buildSidebar();
   buildElevationChart();
   selectDay(1);
@@ -151,6 +174,11 @@ function restoreRouteLayers() {
       } });
   }
 
+  // Photo clustering layers — image must be re-added after style swap
+  if (!map.getSource('photos')) {
+    loadCameraPin(addPhotoMarkers);
+  }
+
   if (activeDay) selectDay(activeDay);
 
   // Sync button states with initial defaults
@@ -194,52 +222,104 @@ function addCampMarkers() {
 
 // ── PHOTO MARKERS ─────────────────────────────────
 function addPhotoMarkers() {
-  PHOTOS.forEach((photo, i) => {
-    if (photo.lat == null || photo.lng == null) return;
+  const features = PHOTOS
+    .map((p, i) => {
+      if (p.lat == null || p.lng == null) return null;
+      return { type: 'Feature', geometry: { type: 'Point', coordinates: [p.lng, p.lat] }, properties: { idx: i } };
+    })
+    .filter(Boolean);
 
-    // Outer el is owned by Mapbox for positioning — never set transform on it
-    const el = document.createElement('div');
-    Object.assign(el.style, { width: '28px', height: '28px', cursor: 'pointer' });
+  map.addSource('photos', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features },
+    cluster: true,
+    clusterMaxZoom: 16,
+    clusterRadius: 30,
+  });
 
-    // Inner icon — scale this, not the outer el
-    const icon = document.createElement('div');
-    Object.assign(icon.style, {
-      width:           '28px',
-      height:          '28px',
-      borderRadius:    '50%',
-      background:      '#1a1410',
-      border:          '2px solid #c9972a',
-      display:         'flex',
-      alignItems:      'center',
-      justifyContent:  'center',
-      fontSize:        '12px',
-      transformOrigin: 'center',
-      transition:      'transform 0.2s',
-      boxShadow:       '0 2px 6px rgba(0,0,0,0.5)',
-    });
-    icon.innerHTML = '📷';
-    el.appendChild(icon);
+  // Cluster circle
+  map.addLayer({
+    id: 'photo-clusters',
+    type: 'circle',
+    source: 'photos',
+    filter: ['has', 'point_count'],
+    paint: {
+      'circle-color': '#c9972a',
+      'circle-radius': 10,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#fff',
+    },
+  });
 
-    // Hover popup with thumbnail
-    const popup = new mapboxgl.Popup({
-      closeButton: false,
-      closeOnClick: false,
-      offset: 16,
-      className: 'photo-hover-popup',
-    });
-    const caption = photo.caption || photo.url.split('/').pop();
-    popup.setHTML(`<img src="${photo.url}" style="width:160px;height:110px;object-fit:cover;display:block;border-radius:2px;">
-      ${caption ? `<div style="padding:4px 6px;font-size:11px;color:#f5f0e8;max-width:160px;">${caption}</div>` : ''}`);
+  // Cluster count label
+  map.addLayer({
+    id: 'photo-cluster-count',
+    type: 'symbol',
+    source: 'photos',
+    filter: ['has', 'point_count'],
+    layout: {
+      'text-field': ['to-string', ['get', 'point_count']],
+      'text-font': ['DIN Offc Pro bold', 'Arial Unicode MS Bold'],
+      'text-size': 12,
+      'text-allow-overlap': true,
+    },
+    paint: { 'text-color': '#fff' },
+  });
 
-    el.addEventListener('mouseenter', () => { icon.style.transform = 'scale(1.3)'; popup.addTo(map); });
-    el.addEventListener('mouseleave', () => { icon.style.transform = 'scale(1)';   popup.remove();   });
-    el.addEventListener('click', () => openModal(PHOTOS[i]));
+  // Single photo marker — camera pin icon
+  map.addLayer({
+    id: 'photo-singles',
+    type: 'symbol',
+    source: 'photos',
+    filter: ['!', ['has', 'point_count']],
+    layout: {
+      'icon-image': 'camera-pin',
+      'icon-size': 0.65,       // 640px SVG * 0.065 ≈ 42px rendered
+      'icon-anchor': 'bottom',  // pin tip aligns with the coordinate
+      'icon-allow-overlap': true,
+    },
+  });
 
-    new mapboxgl.Marker({ element: el })
-      .setLngLat([photo.lng, photo.lat])
+  // Hover popup for singles
+  const hoverPopup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false,
+    offset: 16,
+    className: 'photo-hover-popup',
+  });
+
+  map.on('mouseenter', 'photo-singles', e => {
+    map.getCanvas().style.cursor = 'pointer';
+    const idx   = e.features[0].properties.idx;
+    const photo = PHOTOS[idx];
+    const caption = photo.caption || '';
+    hoverPopup
+      .setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<img src="${photo.url}" style="width:160px;height:110px;object-fit:cover;display:block;">
+        ${caption ? `<div style="padding:4px 6px;font-size:11px;color:#f5f0e8;max-width:160px;">${caption}</div>` : ''}`)
       .addTo(map);
+  });
+  map.on('mouseleave', 'photo-singles', () => {
+    map.getCanvas().style.cursor = '';
+    hoverPopup.remove();
+  });
+  map.on('mouseenter', 'photo-clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'photo-clusters', () => { map.getCanvas().style.cursor = ''; });
 
-    popup.setLngLat([photo.lng, photo.lat]);
+  // Click single — open lightbox
+  map.on('click', 'photo-singles', e => {
+    const idx = e.features[0].properties.idx;
+    openModalGroup([idx], 0);
+  });
+
+  // Click cluster — gather all leaf photo indices, open lightbox
+  map.on('click', 'photo-clusters', e => {
+    const clusterId = e.features[0].properties.cluster_id;
+    map.getSource('photos').getClusterLeaves(clusterId, Infinity, 0, (err, leaves) => {
+      if (err || !leaves) return;
+      const indices = leaves.map(f => f.properties.idx);
+      openModalGroup(indices, 0);
+    });
   });
 }
 
@@ -264,7 +344,6 @@ function buildSidebar() {
       <div class="day-num">${d.day}</div>
       <div class="day-info">
         <div class="day-camp">${d.name}</div>
-        <div class="day-meta">${d.miles ? d.miles + ' mi · +' + d.gain.toLocaleString() + '\'' : 'Base Camp'}</div>
       </div>
     `;
     item.appendChild(playBtn);
@@ -314,10 +393,12 @@ function flyToSegment(dayNum) {
     ? d.startBearing
     : computeBearing(segCoords[0], segCoords[Math.min(3, segCoords.length - 1)]);
 
+  const pitch = d.startPitch ?? 50;
+
   if (dayNum === 1) {
-    map.flyTo({ center: [d.coords.lng, d.coords.lat], zoom: 15, pitch: 50, bearing, duration: 1200 });
+    map.flyTo({ center: [d.coords.lng, d.coords.lat], zoom: 15, pitch, bearing, duration: 1200 });
   } else {
-    map.flyTo({ center: segCoords[0], zoom: 13, pitch: 50, bearing, duration: 1200 });
+    map.flyTo({ center: segCoords[0], zoom: 13, pitch, bearing, duration: 1200 });
   }
 }
 
@@ -325,13 +406,14 @@ function flyToSegment(dayNum) {
 function renderDayDetail(d) {
   const panel = document.getElementById('day-detail');
 
+  /*
   const campBadgeMap = { staffed: '★ Staffed', trail: '◆ Trail', dry: '○ Dry Camp', layover: '⟳ Layover' };
   const campBadge    = campBadgeMap[d.type] || '';
 
   const featureTags = d.features
     .map(f => `<span class="feature-tag">${f}</span>`)
     .join('');
-
+  */
   const dayPhotos = PHOTOS
     .map((p, i) => ({ ...p, _idx: i }))
     .filter(p => p.day === d.day);
@@ -348,9 +430,7 @@ function renderDayDetail(d) {
        </div>`;
 
   panel.innerHTML = `
-    <div id="detail-day-label">Day ${d.day} of 12 · ${campBadge}</div>
     <div id="detail-camp-name">${d.name}</div>
-    <div id="detail-route">${d.from ? d.from + ' → ' + d.to : 'Trek begins here'}</div>
 
     <div class="detail-stats-row">
       <div class="d-stat">
@@ -371,8 +451,7 @@ function renderDayDetail(d) {
       </div>
     </div>
 
-    <div id="detail-features">${featureTags}</div>
-    <hr class="detail-divider">
+        <hr class="detail-divider">
     <div id="detail-narrative">${d.narrative}</div>
     <hr class="detail-divider">
     <div id="detail-photos-label">Photos from this day</div>
@@ -381,6 +460,22 @@ function renderDayDetail(d) {
       ▶ &nbsp;Animate Day ${d.day}
     </button>
   `;
+}
+
+// ── ANIMATION HELPERS ─────────────────────────────
+function haversineM([lng1, lat1], [lng2, lat2]) {
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function segmentDistanceM(coords) {
+  let d = 0;
+  for (let i = 1; i < coords.length; i++) d += haversineM(coords[i-1], coords[i]);
+  return d;
 }
 
 // ── ANIMATION ─────────────────────────────────────
@@ -397,9 +492,12 @@ function playDay(dayNum) {
     return;
   }
 
-  animating = true;
+  animating    = true;
+  animPaused   = false;
+  animPausedAt = 0;
   document.getElementById('anim-bar').classList.add('visible');
   document.getElementById('anim-label').textContent = `Day ${dayNum}: ${DAYS[dayNum - 1].name}`;
+  document.getElementById('anim-stop-btn').textContent = '⏸ Pause';
 
   document.querySelectorAll('.day-play-btn').forEach(b => b.classList.remove('playing'));
   const pb = document.getElementById(`play-btn-${dayNum}`);
@@ -439,28 +537,59 @@ function playDay(dayNum) {
   });
 
   const totalPoints  = segCoords.length;
-  const DURATION_MS  = totalPoints * 150; // ~150ms per point — adjust to taste
-  const segElev      = ELEV_PROFILE.slice(seg.start, seg.end + 1);
-  let startTime      = null;
+  // ── Speed tuning ─────────────────────────────────────────────
+  // ANIM_SPEED_MPS: ground speed in m/s — higher = faster animation
+  // Duration is based on real segment distance so flat and steep days
+  // animate at a consistent pace regardless of point density.
+  const ANIM_SPEED_MPS = 100; // m/s of simulated ground speed — ~40s for a 5-mile day
+  const DURATION_MS    = (segmentDistanceM(segCoords) / ANIM_SPEED_MPS) * 1000;
+  const segElev  = ELEV_PROFILE.slice(seg.start, seg.end + 1);
+  animStartTime  = null;
+  animPausedAt   = 0;
 
   // ── Pitch tuning ──────────────────────────────────────────
   // PITCH_CLIMB: camera angle when ascending (high = tight on the slope ahead)
   // PITCH_DESCENT: camera angle when descending (low = pulls back to reveal the drop)
   // ELEV_LOOKAHEAD: how many points ahead to sample for gradient detection
   // PITCH_SMOOTH: lerp factor per frame (lower = slower transition, higher = snappier)
-  const PITCH_CLIMB    = 40;   // degrees — steep, close to the terrain
-  const PITCH_DESCENT  = 20;   // degrees — wide, reveals what's ahead
-  const ELEV_LOOKAHEAD = 100;   // points ahead to compare elevation
+  const PITCH_CLIMB    = 55;   // degrees — steep, close to the terrain
+  const PITCH_DESCENT  = 30;   // degrees — wide, reveals what's ahead
+  const ELEV_LOOKAHEAD = 50;   // points ahead to compare elevation
   const PITCH_SMOOTH   = 0.06; // 0–1: how fast pitch transitions between values (lerp owns smoothing — Mapbox duration is 0)
   // ──────────────────────────────────────────────────────────
 
   let currentPitch   = 50;
 
+  // ── Cumulative distance LUT ───────────────────────────────
+  // Maps time fraction uniformly to ground distance, not point index.
+  // Without this, sparse points (flat terrain) animate faster than dense points.
+  const cumDist = new Float64Array(totalPoints);
+  for (let i = 1; i < totalPoints; i++) {
+    cumDist[i] = cumDist[i - 1] + haversineM(segCoords[i - 1], segCoords[i]);
+  }
+  const totalDist = cumDist[totalPoints - 1];
+
+  // Given a time fraction (0–1), return the floating-point point index
+  // that corresponds to that fraction of total ground distance.
+  function distToFloatIndex(t) {
+    const targetDist = t * totalDist;
+    // Binary search for the segment containing targetDist
+    let lo = 0, hi = totalPoints - 1;
+    while (lo < hi - 1) {
+      const mid = (lo + hi) >> 1;
+      if (cumDist[mid] <= targetDist) lo = mid; else hi = mid;
+    }
+    const segLen = cumDist[hi] - cumDist[lo];
+    const frac   = segLen > 0 ? (targetDist - cumDist[lo]) / segLen : 0;
+    return lo + frac;
+  }
+  // ──────────────────────────────────────────────────────────
+
   // ── Bearing tuning ────────────────────────────────────────
   // BEARING_LOOKAHEAD: points ahead used to compute target heading
   //   (higher = smoother direction, less responsive to tight turns)
   // BEARING_SMOOTH: lerp factor per frame (lower = slower/floatier rotation)
-  const BEARING_LOOKAHEAD = 150;  // points ahead — raise to reduce jitter
+  const BEARING_LOOKAHEAD = 200;  // points ahead — raise to reduce jitter
   const BEARING_SMOOTH    = 0.005; // 0–1: rotation speed per frame
   // ──────────────────────────────────────────────────────────
 
@@ -476,6 +605,12 @@ function playDay(dayNum) {
 
   function lerpNum(a, b, t) {
     return a + (b - a) * t;
+  }
+
+  // Lerp bearing via the shortest arc (avoids 350°→10° spinning 340° the wrong way)
+  function lerpBearing(a, b, t) {
+    let delta = ((b - a + 540) % 360) - 180; // normalize to -180…+180
+    return a + delta * t;
   }
 
   function targetPitch(i) {
@@ -495,12 +630,14 @@ function playDay(dayNum) {
     essential: true,
   });
 
-  function tick(timestamp) {
+  animTick = function tick(timestamp) {
     if (!animating) return;
 
-    if (!startTime) startTime = timestamp;
-    const t          = Math.min((timestamp - startTime) / DURATION_MS, 1);
-    const floatIndex = t * (totalPoints - 1);
+    if (!animStartTime) animStartTime = timestamp - animPausedAt;
+    const elapsed = timestamp - animStartTime;
+    animPausedAt  = elapsed;  // keep current so resume knows where to pick up
+    const t       = Math.min(elapsed / DURATION_MS, 1);
+    const floatIndex = distToFloatIndex(t);
     const i          = Math.floor(floatIndex);
     const frac       = floatIndex - i;
 
@@ -527,7 +664,7 @@ function playDay(dayNum) {
     if (i < totalPoints - 1) {
       currentPitch   = lerpNum(currentPitch, targetPitch(i), PITCH_SMOOTH);
       const targetBearing = computeBearing(currentPos, segCoords[Math.min(i + BEARING_LOOKAHEAD, totalPoints - 1)]);
-      currentBearing = lerpNum(currentBearing, targetBearing, BEARING_SMOOTH);
+      currentBearing = lerpBearing(currentBearing, targetBearing, BEARING_SMOOTH);
       map.easeTo({
         center:   currentPos,
         bearing:  currentBearing,
@@ -538,17 +675,38 @@ function playDay(dayNum) {
     }
 
     if (t < 1) {
-      animFrame = requestAnimationFrame(tick);
+      animFrame = requestAnimationFrame(animTick);
     } else {
       stopAnimation();
     }
-  }
+  };
 
-  setTimeout(() => { if (animating) animFrame = requestAnimationFrame(tick); }, 1400);
+  setTimeout(() => { if (animating) animFrame = requestAnimationFrame(animTick); }, 1400);
+}
+
+function pauseAnimation() {
+  if (!animTick) return;
+  if (animPaused) {
+    // Resume — animPausedAt holds elapsed ms; null startTime so tick recomputes it
+    animPaused    = false;
+    animStartTime = null;
+    animating     = true;
+    animFrame     = requestAnimationFrame(animTick);
+    document.getElementById('anim-stop-btn').textContent = '⏸ Pause';
+  } else {
+    // Pause — animPausedAt is kept current by tick each frame
+    animPaused = true;
+    if (animFrame) cancelAnimationFrame(animFrame);
+    document.getElementById('anim-stop-btn').textContent = '▶ Resume';
+  }
 }
 
 function stopAnimation() {
-  animating = false;
+  animating    = false;
+  animPaused   = false;
+  animPausedAt = 0;
+  animStartTime = null;
+  animTick     = null;
   if (animFrame) cancelAnimationFrame(animFrame);
 
   document.getElementById('anim-bar').classList.remove('visible');
@@ -660,8 +818,8 @@ function buildElevationChart() {
           display: true,
           grid:    { color: 'rgba(255,255,255,0.05)', drawBorder: false },
           ticks: {
-            color: '#7a7065',
-            font:  { size: 8, family: 'Source Serif 4, Georgia, serif' },
+            color: '#b0c4ca',
+            font:  { size: 9, family: 'DM Sans, system-ui, sans-serif' },
             callback:     v => v >= 1000 ? (v / 1000).toFixed(1) + 'k\'' : v + '\'',
             maxTicksLimit: 4,
           },
@@ -680,19 +838,36 @@ function buildElevationChart() {
 }
 
 // ── PHOTO MODAL ───────────────────────────────────
-function openModal(photo) {
-  const PLACEHOLDER = 'data:image/svg+xml,'
-    + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">'
-    + '<rect fill="#1a1410" width="600" height="400"/>'
-    + '<text x="300" y="200" fill="#7a7065" text-anchor="middle" font-size="48">📷</text>'
-    + '<text x="300" y="250" fill="#7a7065" text-anchor="middle" font-size="16" font-family="serif">Photo coming soon</text>'
-    + '</svg>');
+let _modalGroup = [];
+let _modalPos   = 0;
 
-  document.getElementById('modal-img').src             = photo.url || PLACEHOLDER;
+function openModal(photo) {
+  openModalGroup([PHOTOS.indexOf(photo)], 0);
+}
+
+function openModalGroup(indices, pos) {
+  _modalGroup = indices;
+  _modalPos   = pos;
+  renderModalPhoto();
+  document.getElementById('photo-modal').classList.add('open');
+}
+
+function renderModalPhoto() {
+  const photo = PHOTOS[_modalGroup[_modalPos]];
+  document.getElementById('modal-img').src             = photo.url || '';
   document.getElementById('modal-title').textContent   = photo.caption || '';
   document.getElementById('modal-caption').textContent = photo.author || '';
   document.getElementById('modal-meta').textContent    = photo.day ? `Day ${photo.day} · ${DAYS[photo.day - 1]?.name || ''}` : '';
-  document.getElementById('photo-modal').classList.add('open');
+
+  const total = _modalGroup.length;
+  document.getElementById('modal-counter').textContent = total > 1 ? `${_modalPos + 1} / ${total}` : '';
+  document.getElementById('modal-prev').style.display  = total > 1 ? 'flex' : 'none';
+  document.getElementById('modal-next').style.display  = total > 1 ? 'flex' : 'none';
+}
+
+function modalNav(dir) {
+  _modalPos = (_modalPos + dir + _modalGroup.length) % _modalGroup.length;
+  renderModalPhoto();
 }
 
 function closeModal() {
@@ -704,7 +879,12 @@ document.getElementById('photo-modal').addEventListener('click', e => {
 });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
+  const modalOpen = document.getElementById('photo-modal').classList.contains('open');
+  if (e.key === 'Escape') { closeModal(); return; }
+  if (modalOpen) {
+    if (e.key === 'ArrowLeft')  { modalNav(-1); return; }
+    if (e.key === 'ArrowRight') { modalNav(1);  return; }
+  }
 });
 
 // ── START ─────────────────────────────────────────

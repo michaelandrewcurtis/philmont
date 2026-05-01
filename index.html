@@ -12,7 +12,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -37,15 +37,14 @@
     </div>
     <div id="header-stats">
       <div class="h-stat"><div class="val">Itinerary 12-13</div><div class="lbl">COPE and Climbing Trek</div></div>
-      <div class="h-stat"><div class="val">59</div><div class="lbl">Miles</div></div>
+      <div class="h-stat"><div class="val">65</div><div class="lbl">Miles</div></div>
       <div class="h-stat"><div class="val">12</div><div class="lbl">Days</div></div>
-      <div class="h-stat"><div class="val">10,510'</div><div class="lbl">Max Elev</div></div>
-      <div class="h-stat"><div class="val">13</div><div class="lbl">Scouts</div></div>
+      <div class="h-stat"><div class="val">11,742'</div><div class="lbl">Max Elev</div></div>
     </div>
     <div id="header-controls">
       <button class="ctrl-btn" id="btn-overview" onclick="flyToOverview()">Overview</button>
       <button class="ctrl-btn active" id="btn-terrain" onclick="toggleTerrain()">3D Terrain</button>
-      <button class="ctrl-btn" id="btn-satellite" onclick="toggleSatellite()">Satellite</button>
+      <button class="ctrl-btn" id="btn-satellite" onclick="toggleSatellite()">Topo</button>
     </div>
   </div>
 
@@ -74,7 +73,8 @@
       <!-- Animation progress bar -->
       <div id="anim-bar">
         <span id="anim-label">Animating Day 1...</span>
-        <button id="anim-stop-btn" onclick="stopAnimation()">Stop</button>
+        <button id="anim-stop-btn" onclick="pauseAnimation()">⏸ Pause</button>
+        <button id="anim-end-btn" onclick="stopAnimation()">■ Stop</button>
       </div>
 
       <!-- Elevation strip -->
@@ -90,11 +90,14 @@
   <div id="photo-modal">
     <div id="photo-modal-inner">
       <button id="modal-close" onclick="closeModal()">×</button>
+      <button id="modal-prev" onclick="modalNav(-1)">&#8249;</button>
+      <button id="modal-next" onclick="modalNav(1)">&#8250;</button>
       <img id="modal-img" src="" alt="">
       <div id="modal-info">
         <div id="modal-title"></div>
         <div id="modal-caption"></div>
         <div id="modal-meta"></div>
+        <div id="modal-counter"></div>
       </div>
     </div>
   </div>
