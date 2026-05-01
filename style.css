@@ -778,10 +778,12 @@ body {
     height: 100dvh;
   }
 
-  /* Map + elevation strip = top 40% */
+  /* Map + elevation strip = top 40%
+     order: -1 pulls it above the sidebar despite coming second in the DOM */
   #map-area {
     height: 40dvh;
     flex: none;
+    order: -1;
   }
 
   /* Shrink elevation strip — 110px is too tall inside a 40dvh slot */
