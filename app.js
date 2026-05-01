@@ -541,7 +541,7 @@ function playDay(dayNum) {
   // ANIM_SPEED_MPS: ground speed in m/s — higher = faster animation
   // Duration is based on real segment distance so flat and steep days
   // animate at a consistent pace regardless of point density.
-  const ANIM_SPEED_MPS = 150; // m/s of simulated ground speed — ~40s for a 5-mile day
+  const ANIM_SPEED_MPS = 110; // m/s of simulated ground speed — ~40s for a 5-mile day
   const DURATION_MS    = (segmentDistanceM(segCoords) / ANIM_SPEED_MPS) * 1000;
   const segElev  = ELEV_PROFILE.slice(seg.start, seg.end + 1);
   animStartTime  = null;
